@@ -47,7 +47,7 @@ export const FEATURES = [
   },
   {
     id: 'progress',
-    title: 'Progres Belajar',
+    title: 'Progress Belajar',
     subtitle: 'Lihat perkembangan',
     icon: '📊',
     href: '/progress',

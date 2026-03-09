@@ -84,7 +84,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Apa itu Laporan WhatsApp?',
-    a: 'Orang tua akan menerima laporan mingguan di WhatsApp tentang progres belajar anak, termasuk mata pelajaran yang dipelajari dan pencapaian.',
+    a: 'Orang tua akan menerima laporan mingguan di WhatsApp tentang progress belajar anak, termasuk mata pelajaran yang dipelajari dan pencapaian.',
   },
 ];
 

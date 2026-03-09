@@ -126,12 +126,12 @@ export function SignInButton() {
                 <X size={14} />
               </button>
 
-              <h3 className="font-bold text-sm mb-3">Masuk untuk menyimpan progres</h3>
+              <h3 className="font-bold text-sm mb-3">Masuk untuk menyimpan progress</h3>
 
               <div className="space-y-2 mb-4">
                 {[
                   { icon: <Save size={14} />, text: 'Simpan XP, streak & pencapaian' },
-                  { icon: <BarChart3 size={14} />, text: 'Lihat progres belajar lengkap' },
+                  { icon: <BarChart3 size={14} />, text: 'Lihat progress belajar lengkap' },
                   { icon: <Trophy size={14} />, text: 'Tampil di papan juara' },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -157,7 +157,7 @@ export function SignInButton() {
               )}
 
               <p className="text-[10px] text-muted-foreground text-center mt-3">
-                Tanpa masuk, kamu tetap bisa belajar — tapi progres hanya tersimpan di perangkat ini.
+                Tanpa masuk, kamu tetap bisa belajar — tapi progress hanya tersimpan di perangkat ini.
               </p>
             </motion.div>
           </>

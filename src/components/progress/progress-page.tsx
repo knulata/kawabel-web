@@ -47,11 +47,11 @@ export function ProgressPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <h2 className="text-xl font-bold">📊 Progres Belajar</h2>
+        <h2 className="text-xl font-bold">📊 Progress Belajar</h2>
         <p className="text-sm text-muted-foreground">
           {student
             ? `Perkembangan belajar ${student.name?.split(' ')[0]}`
-            : 'Masuk untuk melihat progres belajarmu'}
+            : 'Masuk untuk melihat progresss belajarmu'}
         </p>
       </motion.div>
 
@@ -65,7 +65,7 @@ export function ProgressPage() {
             <CardContent className="p-8 text-center space-y-4">
               <Mascot size="xl" className="mx-auto" />
               <div>
-                <h3 className="font-bold text-base">Masuk untuk melihat progres</h3>
+                <h3 className="font-bold text-base">Masuk untuk melihat progress</h3>
                 <p className="text-sm text-muted-foreground mt-1">
                   Dengan masuk menggunakan Google, semua hasil belajar, skor, dan pencapaianmu akan tersimpan dan bisa dilihat di sini.
                 </p>
@@ -74,7 +74,7 @@ export function ProgressPage() {
                 <SignInButton />
               </div>
               <p className="text-xs text-muted-foreground">
-                Tanpa masuk, kamu tetap bisa belajar — tapi progres tidak tersimpan ke server.
+                Tanpa masuk, kamu tetap bisa belajar — tapi progress tidak tersimpan ke server.
               </p>
             </CardContent>
           </Card>

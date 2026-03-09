@@ -49,7 +49,7 @@ const BENEFITS = [
   {
     icon: <BarChart3 size={22} />,
     title: 'Dashboard & Laporan',
-    desc: 'Pantau progres setiap siswa. Lihat mata pelajaran yang dikuasai dan yang perlu ditingkatkan.',
+    desc: 'Pantau progress setiap siswa. Lihat mata pelajaran yang dikuasai dan yang perlu ditingkatkan.',
     gradient: 'from-purple-400 to-purple-600',
   },
   {
@@ -86,7 +86,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Bagaimana cara kerjanya?',
-    a: 'Anda mendaftar sebagai Partner, kami buatkan akun untuk setiap siswa Anda. Siswa bisa akses Kawabel dari HP atau laptop masing-masing. Anda bisa memantau progres semua siswa dari dashboard.',
+    a: 'Anda mendaftar sebagai Partner, kami buatkan akun untuk setiap siswa Anda. Siswa bisa akses Kawabel dari HP atau laptop masing-masing. Anda bisa memantau progress semua siswa dari dashboard.',
   },
   {
     q: 'Apakah ada kontrak atau ikatan?',

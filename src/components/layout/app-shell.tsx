@@ -66,7 +66,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="flex items-center gap-2" onClick={handleNavTap}>
             <Mascot size="md" />
             <span
-              className="text-xl font-black kawabel-gradient-text tracking-wide hidden sm:inline"
+              className="text-xl font-black kawabel-gradient-text tracking-wide"
               style={{ fontFamily: 'var(--font-nunito)' }}
             >
               kawabel
@@ -142,7 +142,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="max-w-3xl mx-auto flex items-center gap-3">
               <Save size={16} className="text-blue-500 shrink-0" />
               <p className="text-xs text-blue-700 flex-1">
-                <span className="font-semibold">Masuk dengan Google</span> untuk menyimpan progres, XP, dan pencapaianmu di semua perangkat.
+                <span className="font-semibold">Masuk dengan Google</span> untuk menyimpan progress, XP, dan pencapaianmu di semua perangkat.
               </p>
               <button
                 onClick={() => setShowSignInHint(false)}
