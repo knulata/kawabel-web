@@ -122,7 +122,7 @@ export function HomePage() {
               className="text-2xl font-bold text-white"
               style={{ fontFamily: 'var(--font-nunito)' }}
             >
-              {firstName ? `Halo ${firstName}!` : 'Teman Belajar AI-mu'}
+              {firstName ? `Halo ${firstName}!` : 'Kawan Belajar AI-mu'}
             </motion.h1>
 
             <motion.p
@@ -148,7 +148,7 @@ export function HomePage() {
             </motion.div>
           </motion.div>
 
-          <div className="px-4 space-y-5 -mt-4">
+          <div className="px-4 space-y-5 mt-2">
             {/* Trial banner */}
             <TrialBanner />
 
@@ -159,7 +159,7 @@ export function HomePage() {
               animate="show"
               className="space-y-3"
             >
-              <h3 className="text-sm font-bold text-foreground pt-1">
+              <h3 className="text-sm font-bold text-foreground">
                 Apa yang bisa {MASCOT_NAME} bantu?
               </h3>
 
