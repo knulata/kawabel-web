@@ -86,7 +86,7 @@ export function HomePage() {
   }, []);
 
   return (
-    <div className="pb-24 sm:pb-8 max-w-xl mx-auto">
+    <div className="pb-6 sm:pb-8 max-w-xl mx-auto">
       <AchievementToast
         achievementId={showAchievement}
         onDismiss={handleAchievementDismiss}

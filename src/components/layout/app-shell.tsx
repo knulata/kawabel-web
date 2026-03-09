@@ -65,17 +65,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5" onClick={handleNavTap}>
             <Mascot size="lg" />
-            <div className="flex flex-col">
-              <span
-                className="text-2xl font-black kawabel-gradient-text tracking-wide leading-none"
-                style={{ fontFamily: 'var(--font-nunito)' }}
-              >
-                kawabel
-              </span>
-              <span className="text-[10px] text-muted-foreground tracking-widest font-light mt-0.5">
-                kawan belajar
-              </span>
-            </div>
+            <span
+              className="text-2xl font-black kawabel-gradient-text tracking-wide"
+              style={{ fontFamily: 'var(--font-nunito)' }}
+            >
+              kawabel
+            </span>
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-3">
