@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStudent } from '@/store/use-student';
 import { useGamification } from '@/store/use-gamification';
@@ -13,9 +13,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { SUBJECTS } from '@/lib/constants';
 import { playTap } from '@/lib/sounds';
 import { hapticLight } from '@/lib/haptics';
+import { PermissionGuide, usePermission } from '@/components/chat/permission-guide';
 import { ComboCounter } from '@/components/home/combo-counter';
 import { UpgradePrompt } from '@/components/pricing/upgrade-prompt';
-import { BookOpen, Loader2, Check, X, ArrowRight, RotateCcw, ChevronLeft } from 'lucide-react';
+import { Mascot } from '@/components/mascot';
+import {
+  BookOpen, Loader2, Check, X, ArrowRight, RotateCcw,
+  ChevronLeft, Camera, ImageIcon,
+} from 'lucide-react';
 import type { TestQuestion } from '@/types';
 
 type Phase = 'select' | 'topic' | 'loading' | 'quiz' | 'results';
@@ -35,25 +40,108 @@ export function TestPrepPage() {
   const { correctAnswer, wrongAnswer, breakCombo, combo, hearts, earnAchievement, addXP } =
     useGamification();
   const { canUse, incrementUsage } = useSubscription();
+  const cameraPerm = usePermission('camera');
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showPermGuide, setShowPermGuide] = useState(false);
   const [phase, setPhase] = useState<Phase>('select');
   const [subject, setSubject] = useState('');
   const [topic, setTopic] = useState('');
+  const [bookImage, setBookImage] = useState<string | null>(null);
   const [questions, setQuestions] = useState<TestQuestion[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectSubject = (subj: string) => {
     playTap();
     hapticLight();
     setSubject(subj);
     setTopic('');
+    setBookImage(null);
     setPhase('topic');
   };
 
-  const generateQuiz = useCallback(
+  const handleCameraClick = async () => {
+    if (cameraPerm.status === 'denied') {
+      setShowPermGuide(true);
+      return;
+    }
+    if (cameraPerm.status === 'prompt') {
+      const granted = await cameraPerm.request();
+      if (!granted) {
+        setShowPermGuide(true);
+        return;
+      }
+    }
+    if (!canUse('photos')) {
+      setShowUpgrade(true);
+      return;
+    }
+    fileInputRef.current?.click();
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    incrementUsage('photos');
+    const reader = new FileReader();
+    reader.onload = () => setBookImage(reader.result as string);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const generateQuizFromPhoto = useCallback(
+    async () => {
+      if (!bookImage || !canUse('quizzes')) {
+        if (!canUse('quizzes')) setShowUpgrade(true);
+        return;
+      }
+      incrementUsage('quizzes');
+      setPhase('loading');
+      setCurrentQ(0);
+      setAnswers([]);
+      breakCombo();
+
+      try {
+        const result = await sendChat(
+          [
+            {
+              role: 'user' as const,
+              content: [
+                {
+                  type: 'text' as const,
+                  text: `Look at this textbook page for subject "${subject}". Read and understand the content, then generate 5 multiple choice questions in Indonesian that test the student's understanding of this material. Questions should be suitable for a ${student?.grade || 'SD'} student.
+Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]`,
+                },
+                { type: 'image_url' as const, image_url: { url: bookImage } },
+              ],
+            },
+          ] as never[],
+          student?.id ?? 0,
+          'full', // vision model for reading textbook
+        );
+        const parsed = JSON.parse(
+          result.reply.replace(/```json?\n?/g, '').replace(/```/g, '').trim()
+        );
+        setQuestions(Array.isArray(parsed) ? parsed : []);
+        setPhase('quiz');
+      } catch {
+        setPhase('topic');
+      }
+    },
+    [student, subject, bookImage, breakCombo, canUse, incrementUsage]
+  );
+
+  // Auto-generate when photo is selected
+  useEffect(() => {
+    if (bookImage && phase === 'topic') {
+      generateQuizFromPhoto();
+    }
+  }, [bookImage, phase, generateQuizFromPhoto]);
+
+  const generateQuizFromTopic = useCallback(
     async (subj: string, topicText: string) => {
       if (!canUse('quizzes')) {
         setShowUpgrade(true);
@@ -66,9 +154,7 @@ export function TestPrepPage() {
       setAnswers([]);
       breakCombo();
 
-      const topicPrompt = topicText
-        ? `about the topic "${topicText}"`
-        : '';
+      const topicPrompt = topicText ? `about the topic "${topicText}"` : '';
 
       try {
         const result = await sendChat(
@@ -123,7 +209,6 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
         earnAchievement('PERFECT_QUIZ');
         addXP(20);
       }
-
       earnAchievement('FIRST_LESSON');
 
       if (student) {
@@ -153,6 +238,16 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto">
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleImageSelect}
+        className="hidden"
+      />
+
       {/* Combo counter overlay */}
       {phase === 'quiz' && <ComboCounter />}
 
@@ -166,7 +261,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
           {phase === 'select'
             ? 'Pilih mata pelajaran untuk mulai latihan'
             : phase === 'topic'
-              ? `${subject} — pilih atau ketik topik`
+              ? `${subject} — foto buku atau pilih topik`
               : ''}
         </p>
       </motion.div>
@@ -181,6 +276,20 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
           💔 Hati habis! Tunggu regenerasi atau isi ulang dengan gems.
         </motion.div>
       )}
+
+      {/* Permission guide */}
+      <AnimatePresence>
+        {showPermGuide && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="mb-4"
+          >
+            <PermissionGuide type="camera" onDismiss={() => setShowPermGuide(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence mode="wait">
         {/* ── Subject selection ── */}
@@ -217,19 +326,70 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             className="space-y-4"
           >
             <button
-              onClick={() => { setPhase('select'); playTap(); }}
+              onClick={() => { setPhase('select'); setBookImage(null); playTap(); }}
               className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <ChevronLeft size={16} />
               Ganti mata pelajaran
             </button>
 
+            {/* Photo book option — primary CTA */}
+            <Card className="border-primary/30 bg-gradient-to-br from-green-50 to-emerald-50 shadow-sm">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Camera size={20} className="text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold">Foto halaman buku</h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      Foto halaman buku pelajaran — soal akan dibuat berdasarkan isi buku
+                    </p>
+                  </div>
+                </div>
+
+                {/* Image preview */}
+                {bookImage && (
+                  <div className="mb-4 relative">
+                    <img
+                      src={bookImage}
+                      alt="Halaman buku"
+                      className="w-full rounded-xl border border-border max-h-48 object-cover"
+                    />
+                    <button
+                      onClick={() => setBookImage(null)}
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                )}
+
+                <Button
+                  onClick={handleCameraClick}
+                  className="w-full rounded-xl h-12 text-base font-semibold gap-2 kawabel-gradient text-white"
+                  disabled={hearts === 0}
+                >
+                  <Camera size={18} />
+                  Foto Buku Pelajaran
+                </Button>
+                <p className="text-center text-xs text-muted-foreground mt-2">
+                  Bisa juga pilih foto dari galeri
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-sm text-muted-foreground">atau ketik topik</span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+
+            {/* Manual topic input */}
             <Card>
               <CardContent className="p-5 space-y-4">
                 <div>
-                  <label className="text-base font-semibold block mb-2">
-                    Mau latihan topik apa?
-                  </label>
                   <Textarea
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
@@ -240,28 +400,26 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 </div>
 
                 {suggestions.length > 0 && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">Atau pilih topik:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {suggestions.map((s) => (
-                        <button
-                          key={s}
-                          onClick={() => { setTopic(s); playTap(); }}
-                          className={`px-3 py-1.5 rounded-full border text-sm transition-colors ${
-                            topic === s
-                              ? 'bg-primary text-primary-foreground border-primary'
-                              : 'border-border text-muted-foreground hover:bg-muted'
-                          }`}
-                        >
-                          {s}
-                        </button>
-                      ))}
-                    </div>
+                  <div className="flex flex-wrap gap-2">
+                    {suggestions.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => { setTopic(s); playTap(); }}
+                        className={`px-3 py-1.5 rounded-full border text-sm transition-colors ${
+                          topic === s
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'border-border text-muted-foreground hover:bg-muted'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
                   </div>
                 )}
 
                 <Button
-                  onClick={() => generateQuiz(subject, topic)}
+                  onClick={() => generateQuizFromTopic(subject, topic)}
+                  variant="outline"
                   className="w-full rounded-xl h-12 text-base font-semibold"
                   disabled={hearts === 0}
                 >
@@ -280,13 +438,18 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center py-16 gap-3"
+            className="flex flex-col items-center py-16 gap-4"
           >
-            <Loader2 className="animate-spin text-primary" size={32} />
-            <p className="text-base text-muted-foreground">
-              Menyiapkan soal {subject}
-              {topic ? ` — ${topic}` : ''}...
-            </p>
+            <Mascot size="xl" animate />
+            <Loader2 className="animate-spin text-primary" size={28} />
+            <div className="text-center">
+              <p className="font-semibold text-base">
+                {bookImage ? 'Membaca buku & menyiapkan soal...' : `Menyiapkan soal ${subject}...`}
+              </p>
+              {topic && !bookImage && (
+                <p className="text-sm text-muted-foreground mt-1">Topik: {topic}</p>
+              )}
+            </div>
           </motion.div>
         )}
 
@@ -483,6 +646,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 className="flex-1 rounded-xl h-12"
                 onClick={() => {
                   playTap();
+                  setBookImage(null);
                   setPhase('select');
                 }}
               >
@@ -493,7 +657,11 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 className="flex-1 rounded-xl h-12"
                 onClick={() => {
                   playTap();
-                  generateQuiz(subject, topic);
+                  if (bookImage) {
+                    generateQuizFromPhoto();
+                  } else {
+                    generateQuizFromTopic(subject, topic);
+                  }
                 }}
               >
                 Coba Lagi

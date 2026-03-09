@@ -35,7 +35,7 @@ const MAIN_FEATURES = [
   {
     id: 'chat',
     title: 'Tanya PR',
-    desc: 'Ketik pertanyaan, langsung dijawab AI',
+    desc: 'Ketik pertanyaan, langsung dijawab',
     icon: <MessageCircle size={22} />,
     href: '/chat',
     gradient: 'from-green-400 to-emerald-600',
@@ -129,7 +129,7 @@ export function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-white/70 text-base mt-2 max-w-xs mx-auto leading-relaxed"
+              className="text-white/70 text-sm mt-2 max-w-xs mx-auto leading-relaxed"
             >
               Tanya PR, foto soal, latihan ujian, dan dikte Mandarin — semua dibantu AI, kapan saja.
             </motion.p>
