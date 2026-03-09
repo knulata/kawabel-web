@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStudent } from '@/store/use-student';
 import { useGamification } from '@/store/use-gamification';
+import { useSubscription } from '@/store/use-subscription';
 import { sendChat, saveProgress } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,6 +13,7 @@ import { SUBJECTS } from '@/lib/constants';
 import { playTap } from '@/lib/sounds';
 import { hapticLight } from '@/lib/haptics';
 import { ComboCounter } from '@/components/home/combo-counter';
+import { UpgradePrompt } from '@/components/pricing/upgrade-prompt';
 import { BookOpen, Loader2, Check, X, ArrowRight, RotateCcw } from 'lucide-react';
 import type { TestQuestion } from '@/types';
 
@@ -21,6 +23,8 @@ export function TestPrepPage() {
   const { student } = useStudent();
   const { correctAnswer, wrongAnswer, breakCombo, combo, hearts, earnAchievement, addXP } =
     useGamification();
+  const { canUse, incrementUsage } = useSubscription();
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [phase, setPhase] = useState<Phase>('select');
   const [subject, setSubject] = useState('');
   const [questions, setQuestions] = useState<TestQuestion[]>([]);
@@ -32,6 +36,11 @@ export function TestPrepPage() {
   const generateQuiz = useCallback(
     async (subj: string) => {
       if (!student) return;
+      if (!canUse('quizzes')) {
+        setShowUpgrade(true);
+        return;
+      }
+      incrementUsage('quizzes');
       setSubject(subj);
       setPhase('loading');
       setCurrentQ(0);
@@ -58,7 +67,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
         setPhase('select');
       }
     },
-    [student, breakCombo]
+    [student, breakCombo, canUse, incrementUsage]
   );
 
   const handleAnswer = (idx: number) => {
@@ -397,6 +406,13 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Upgrade prompt */}
+      <UpgradePrompt
+        open={showUpgrade}
+        feature="quizzes"
+        onDismiss={() => setShowUpgrade(false)}
+      />
     </div>
   );
 }

@@ -19,6 +19,7 @@ import { FriendsSection } from '@/components/home/friends-section';
 import { AchievementToast } from '@/components/home/achievement-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { TrialBanner } from '@/components/pricing/trial-banner';
 import { Gem, Zap } from 'lucide-react';
 
 const container = {
@@ -152,6 +153,9 @@ export function HomePage() {
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Trial banner */}
+      <TrialBanner />
 
       {/* XP progress bar */}
       <motion.div

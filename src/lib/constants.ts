@@ -79,3 +79,15 @@ export const GRADES = [
   'SMP Kelas 7', 'SMP Kelas 8', 'SMP Kelas 9',
   'SMA Kelas 10', 'SMA Kelas 11', 'SMA Kelas 12',
 ] as const;
+
+export const FREE_LIMITS = {
+  chats: 5,
+  photos: 2,
+  quizzes: 2,
+  dictations: 3,
+} as const;
+
+export const SUBSCRIPTION_PRICE = 1_600_000;
+export const TRIAL_DAYS = 7;
+export const BCA_ACCOUNT = '3722808999';
+export const BCA_NAME = 'Indonesia Technologies V';

@@ -13,11 +13,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { ChatBubble } from '@/components/chat/chat-bubble';
 import { PermissionGuide, usePermission } from '@/components/chat/permission-guide';
 import { Mascot, MASCOT_NAME } from '@/components/mascot';
+import { useSubscription } from '@/store/use-subscription';
+import { UpgradePrompt } from '@/components/pricing/upgrade-prompt';
 
 export function ChatPage() {
   const { student } = useStudent();
   const { messages, isLoading, error, sendMessage, clearMessages } = useChat();
   const { addXP, earnAchievement } = useGamification();
+  const { canUse, incrementUsage } = useSubscription();
+  const [showUpgrade, setShowUpgrade] = useState<'chats' | 'photos' | null>(null);
   const [input, setInput] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
@@ -53,12 +57,19 @@ export function ChatPage() {
     if (!text && !imagePreview) return;
     if (!student) return;
 
+    // Check usage limits
+    if (!canUse('chats')) {
+      setShowUpgrade('chats');
+      return;
+    }
+
     setInput('');
     const img = imagePreview;
     setImagePreview(null);
 
     playTap();
     hapticLight();
+    incrementUsage('chats');
     await sendMessage(text || 'Tolong bantu soal ini', student.id, img || undefined);
     addXP(5); // XP for asking questions
     earnAchievement('FIRST_LESSON');
@@ -90,12 +101,18 @@ export function ChatPage() {
         return;
       }
     }
+    // Check photo usage limits
+    if (!canUse('photos')) {
+      setShowUpgrade('photos');
+      return;
+    }
     fileInputRef.current?.click();
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    incrementUsage('photos');
     const reader = new FileReader();
     reader.onload = () => setImagePreview(reader.result as string);
     reader.readAsDataURL(file);
@@ -356,6 +373,12 @@ export function ChatPage() {
           </Button>
         </div>
       </div>
+      {/* Upgrade prompt */}
+      <UpgradePrompt
+        open={showUpgrade !== null}
+        feature={showUpgrade || 'chats'}
+        onDismiss={() => setShowUpgrade(null)}
+      />
     </div>
   );
 }
