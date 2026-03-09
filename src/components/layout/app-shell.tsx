@@ -63,14 +63,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Top bar */}
       <header className="sticky top-0 z-40 glass border-b border-border/50">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2" onClick={handleNavTap}>
-            <Mascot size="md" />
-            <span
-              className="text-xl font-black kawabel-gradient-text tracking-wide"
-              style={{ fontFamily: 'var(--font-nunito)' }}
-            >
-              kawabel
-            </span>
+          <Link href="/" className="flex items-center gap-2.5" onClick={handleNavTap}>
+            <Mascot size="lg" />
+            <div>
+              <span
+                className="text-2xl font-black kawabel-gradient-text tracking-wide block leading-tight"
+                style={{ fontFamily: 'var(--font-nunito)' }}
+              >
+                kawabel
+              </span>
+              <span className="text-[10px] text-muted-foreground tracking-widest font-light leading-none">
+                kawan belajar
+              </span>
+            </div>
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-3">

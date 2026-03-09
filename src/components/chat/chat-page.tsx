@@ -182,7 +182,7 @@ export function ChatPage() {
           <Mascot size="md" />
           <div>
             <h2 className="font-semibold text-sm">{MASCOT_NAME}</h2>
-            <p className="text-xs text-muted-foreground">Teman belajar AI-mu</p>
+            <p className="text-xs text-muted-foreground">Kawan belajarmu</p>
           </div>
         </div>
         {messages.length > 0 && (
