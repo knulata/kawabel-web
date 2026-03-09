@@ -16,9 +16,10 @@ function getBrowser(): 'chrome' | 'safari' | 'firefox' | 'edge' | 'other' {
   if (typeof navigator === 'undefined') return 'other';
   const ua = navigator.userAgent;
   if (ua.includes('Edg/')) return 'edge';
-  if (ua.includes('Chrome') && !ua.includes('Edg')) return 'chrome';
-  if (ua.includes('Safari') && !ua.includes('Chrome')) return 'safari';
-  if (ua.includes('Firefox')) return 'firefox';
+  // iOS Chrome uses "CriOS" instead of "Chrome"
+  if (ua.includes('Chrome') || ua.includes('CriOS')) return 'chrome';
+  if (ua.includes('Safari')) return 'safari';
+  if (ua.includes('Firefox') || ua.includes('FxiOS')) return 'firefox';
   return 'other';
 }
 
