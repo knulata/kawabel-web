@@ -13,7 +13,7 @@ import { ChestCard } from '@/components/home/chest-card';
 import { AchievementToast } from '@/components/home/achievement-toast';
 import { TrialBanner } from '@/components/pricing/trial-banner';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Share2 } from 'lucide-react';
 
 const container = {
   hidden: {},
@@ -69,6 +69,7 @@ export function HomePage() {
   const xpPct = Math.min((current / needed) * 100, 100);
   const dailyPct = Math.min((dailyXP / dailyGoalXP) * 100, 100);
   const [showAchievement, setShowAchievement] = useState<string | null>(null);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   const firstName = student?.name?.split(' ')[0] || null;
   const isNewUser = xp === 0;
@@ -397,6 +398,43 @@ export function HomePage() {
             </motion.div>
           )}
 
+          {/* Parent share code */}
+          {student?.parent_code && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.32 }}
+            >
+              <Card className="shadow-sm border-blue-200/50 bg-gradient-to-r from-blue-50 to-sky-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Share2 size={16} className="text-blue-500" />
+                    <h3 className="text-sm font-bold text-foreground">Bagikan ke Orang Tua</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Orang tua bisa lihat progress belajarmu di{' '}
+                    <span className="font-semibold">kawabel.com/parent</span>
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 px-3 py-2 rounded-lg bg-white border border-blue-200 font-mono font-bold text-center tracking-wider text-blue-700">
+                      {student.parent_code}
+                    </div>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(student.parent_code!);
+                        setCodeCopied(true);
+                        setTimeout(() => setCodeCopied(false), 2000);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+                    >
+                      {codeCopied ? 'Tersalin!' : 'Salin'}
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
           {/* Upgrade CTA */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -423,6 +461,8 @@ export function HomePage() {
 
       {/* Footer links */}
       <div className="text-center pt-6 pb-2 text-[10px] text-muted-foreground/50">
+        <Link href="/parent" className="hover:underline">Orang Tua</Link>
+        <span className="mx-1.5">·</span>
         <Link href="/privacy" className="hover:underline">Privasi</Link>
         <span className="mx-1.5">·</span>
         <Link href="/terms" className="hover:underline">Ketentuan</Link>

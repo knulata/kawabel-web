@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS students (
   stars INTEGER DEFAULT 0,
   level INTEGER DEFAULT 1,
   pin TEXT,
+  parent_code TEXT UNIQUE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -32,6 +33,7 @@ CREATE TABLE IF NOT EXISTS progress (
 CREATE INDEX IF NOT EXISTS idx_progress_student ON progress(student_id);
 CREATE INDEX IF NOT EXISTS idx_students_email ON students(email);
 CREATE INDEX IF NOT EXISTS idx_progress_created ON progress(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_students_parent_code ON students(parent_code);
 
 -- Function to increment stars
 CREATE OR REPLACE FUNCTION increment_stars(sid INTEGER, amount INTEGER)

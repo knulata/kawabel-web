@@ -41,6 +41,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ student: existing });
     }
 
+    // Generate unique parent code: first 4 chars of name + 4 random digits
+    const codeName = (name || email.split('@')[0])
+      .replace(/[^A-Za-z]/g, '')
+      .slice(0, 4)
+      .toUpperCase();
+    const codeNum = Math.floor(1000 + Math.random() * 9000);
+    const parentCode = `${codeName}-${codeNum}`;
+
     // Create new student
     const { data: newStudent, error } = await db
       .from('students')
@@ -52,6 +60,7 @@ export async function POST(req: NextRequest) {
         grade: 'SD',
         stars: 0,
         level: 1,
+        parent_code: parentCode,
       })
       .select()
       .single();

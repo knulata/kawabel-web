@@ -9,6 +9,7 @@ export interface Student {
   email?: string;
   avatar_url?: string;
   pin?: string;
+  parent_code?: string;
 }
 
 export interface ChatMessage {

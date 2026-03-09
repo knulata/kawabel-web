@@ -24,6 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { HeartsDisplay } from '@/components/home/hearts-display';
 import { Mascot } from '@/components/mascot';
 import { SignInButton } from '@/components/auth/sign-in-button';
+import { OnboardingModal } from '@/components/onboarding/onboarding-modal';
 
 const NAV_ITEMS = [
   { href: '/', icon: Home, label: 'Beranda' },
@@ -46,12 +47,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     regenHearts();
   }, [checkStreak, regenHearts]);
 
+  // Track if onboarding was dismissed this session
+  const [onboardingDone, setOnboardingDone] = useState(false);
+  const showOnboarding = !student?.name && !onboardingDone;
+
   // Show sign-in hint after 30 seconds for guests
   useEffect(() => {
     if (student) return;
     const timer = setTimeout(() => setShowSignInHint(true), 30_000);
     return () => clearTimeout(timer);
   }, [student]);
+
+  // Mark onboarding done when student gets a name
+  useEffect(() => {
+    if (student?.name) setOnboardingDone(true);
+  }, [student?.name]);
 
   const handleNavTap = () => {
     playTap();
@@ -160,6 +170,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Footer links */}
       <div className="text-center py-3 text-[10px] text-muted-foreground/60 sm:pb-2 hidden sm:block">
+        <Link href="/parent" className="hover:underline">Orang Tua</Link>
+        <span className="mx-1.5">·</span>
         <Link href="/privacy" className="hover:underline">Privasi</Link>
         <span className="mx-1.5">·</span>
         <Link href="/terms" className="hover:underline">Ketentuan</Link>
@@ -202,6 +214,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </div>
       </nav>
+
+      {/* Onboarding modal for first-time visitors */}
+      {showOnboarding && <OnboardingModal />}
     </div>
   );
 }
