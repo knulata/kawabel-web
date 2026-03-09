@@ -1,12 +1,12 @@
 'use client';
 
 import { AuthGate } from '@/components/layout/auth-gate';
-import { HomePage } from '@/components/home/home-page';
+import { ChatPage } from '@/components/chat/chat-page';
 
 export default function Page() {
   return (
     <AuthGate>
-      <HomePage />
+      <ChatPage />
     </AuthGate>
   );
 }

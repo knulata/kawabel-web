@@ -1,12 +1,12 @@
 'use client';
 
 import { AuthGate } from '@/components/layout/auth-gate';
-import { HomePage } from '@/components/home/home-page';
+import { TestPrepPage } from '@/components/test-prep/test-prep-page';
 
 export default function Page() {
   return (
     <AuthGate>
-      <HomePage />
+      <TestPrepPage />
     </AuthGate>
   );
 }

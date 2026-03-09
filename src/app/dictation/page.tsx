@@ -1,12 +1,12 @@
 'use client';
 
 import { AuthGate } from '@/components/layout/auth-gate';
-import { HomePage } from '@/components/home/home-page';
+import { DictationPage } from '@/components/dictation/dictation-page';
 
 export default function Page() {
   return (
     <AuthGate>
-      <HomePage />
+      <DictationPage />
     </AuthGate>
   );
 }

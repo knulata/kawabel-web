@@ -1,12 +1,12 @@
 'use client';
 
 import { AuthGate } from '@/components/layout/auth-gate';
-import { HomePage } from '@/components/home/home-page';
+import { LeaderboardPage } from '@/components/leaderboard/leaderboard-page';
 
 export default function Page() {
   return (
     <AuthGate>
-      <HomePage />
+      <LeaderboardPage />
     </AuthGate>
   );
 }
