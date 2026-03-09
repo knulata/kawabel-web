@@ -176,16 +176,9 @@ export function ChatPage() {
 
   return (
     <div className="flex flex-col h-[calc(100dvh-7.5rem)] sm:h-[calc(100dvh-3.5rem)]">
-      {/* Chat header */}
-      <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Mascot size="md" />
-          <div>
-            <h2 className="font-semibold text-sm">{MASCOT_NAME}</h2>
-            <p className="text-xs text-muted-foreground">Kawan belajarmu</p>
-          </div>
-        </div>
-        {messages.length > 0 && (
+      {/* Chat header — only show clear button when there are messages */}
+      {messages.length > 0 && (
+        <div className="px-4 py-2 border-b border-border/50 flex justify-end">
           <Button
             variant="ghost"
             size="sm"
@@ -195,8 +188,8 @@ export function ChatPage() {
             <Trash2 size={16} className="mr-1" />
             Hapus
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Messages */}
       <div
@@ -211,11 +204,11 @@ export function ChatPage() {
             className="flex flex-col items-center justify-center h-full text-center"
           >
             <Mascot size="2xl" className="mb-4" />
-            <h3 className="text-lg font-semibold text-foreground">
-              Halo! Aku {MASCOT_NAME}
+            <h3 className="text-xl font-semibold text-foreground">
+              Ada PR atau soal yang susah?
             </h3>
-            <p className="text-sm text-muted-foreground mt-1 max-w-xs">
-              Tanya aku soal PR, pelajaran, atau foto soalmu. Aku akan bantu kamu memahami jawabannya!
+            <p className="text-base text-muted-foreground mt-1 max-w-xs">
+              Ketik pertanyaan atau foto soalmu — aku bantu jelaskan langkah demi langkah!
             </p>
             <div className="flex flex-wrap gap-2 mt-6 justify-center">
               {['Bantu PR Matematika', 'Jelaskan fotosintesis', 'Latihan soal'].map(
@@ -226,7 +219,7 @@ export function ChatPage() {
                       setInput(suggestion);
                       textareaRef.current?.focus();
                     }}
-                    className="px-3 py-1.5 rounded-full border border-border text-xs text-muted-foreground hover:bg-muted transition-colors"
+                    className="px-3 py-1.5 rounded-full border border-border text-sm text-muted-foreground hover:bg-muted transition-colors"
                   >
                     {suggestion}
                   </button>
@@ -356,7 +349,7 @@ export function ChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isListening ? 'Mendengarkan...' : 'Tanya Kawabel...'}
+            placeholder={isListening ? 'Mendengarkan...' : 'Ketik pertanyaanmu...'}
             className="min-h-[40px] max-h-32 resize-none rounded-2xl bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary"
             rows={1}
           />

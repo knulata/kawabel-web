@@ -47,8 +47,8 @@ export function ProgressPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <h2 className="text-xl font-bold">📊 Progress Belajar</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-bold">📊 Progress Belajar</h2>
+        <p className="text-base text-muted-foreground">
           {student
             ? `Perkembangan belajar ${student.name?.split(' ')[0]}`
             : 'Masuk untuk melihat progresss belajarmu'}
@@ -65,8 +65,8 @@ export function ProgressPage() {
             <CardContent className="p-8 text-center space-y-4">
               <Mascot size="xl" className="mx-auto" />
               <div>
-                <h3 className="font-bold text-base">Masuk untuk melihat progress</h3>
-                <p className="text-sm text-muted-foreground mt-1">
+                <h3 className="font-bold text-lg">Masuk untuk melihat progress</h3>
+                <p className="text-base text-muted-foreground mt-1">
                   Dengan masuk menggunakan Google, semua hasil belajar, skor, dan pencapaianmu akan tersimpan dan bisa dilihat di sini.
                 </p>
               </div>
@@ -159,7 +159,7 @@ export function ProgressPage() {
                   <Card>
                     <CardContent className="p-3 flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium">{entry.subject}</p>
+                        <p className="text-base font-medium">{entry.subject}</p>
                         <p className="text-xs text-muted-foreground">
                           {entry.topic} &middot;{' '}
                           {new Date(entry.created_at).toLocaleDateString('id-ID')}

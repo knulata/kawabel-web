@@ -316,8 +316,8 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <h2 className="text-xl font-bold">✍️ 听写 Dikte Mandarin</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-bold">✍️ 听写 Dikte Mandarin</h2>
+        <p className="text-base text-muted-foreground">
           Foto → Dengarkan → Tulis → Periksa
         </p>
       </motion.div>
@@ -415,19 +415,19 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
               <CardContent className="p-6">
                 <div className="text-center mb-6">
                   <Mascot size="lg" className="mx-auto mb-3" />
-                  <h3 className="font-bold text-base">Langkah 1: Foto Daftar Kata</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <h3 className="font-bold text-lg">Langkah 1: Foto Daftar Kata</h3>
+                  <p className="text-base text-muted-foreground mt-1">
                     Foto halaman buku yang berisi kata-kata Mandarin yang ingin didiktekan
                   </p>
                 </div>
 
                 {/* Instructions card */}
                 <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-5">
-                  <div className="flex items-center gap-2 text-blue-700 font-semibold text-sm mb-2">
+                  <div className="flex items-center gap-2 text-blue-700 font-semibold text-base mb-2">
                     <HelpCircle size={16} />
                     Cara pakai:
                   </div>
-                  <ol className="space-y-2 text-sm text-blue-800">
+                  <ol className="space-y-2 text-base text-blue-800">
                     <li className="flex gap-2">
                       <span className="font-bold text-blue-600">1.</span>
                       <span>Buka buku pelajaran Mandarin di halaman daftar kata (听写词语)</span>
@@ -492,7 +492,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
             <Mascot size="xl" animate />
             <Loader2 className="animate-spin text-primary" size={28} />
             <div className="text-center">
-              <p className="font-semibold text-sm">Membaca kata dari foto...</p>
+              <p className="font-semibold text-base">Membaca kata dari foto...</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {MASCOT_NAME} sedang mengenali karakter Mandarin
               </p>
@@ -510,7 +510,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
           >
             {/* Word count & progress */}
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium">
+              <span className="text-base font-medium">
                 Kata {currentIdx + 1} dari {words.length}
               </span>
               <span className="text-xs text-muted-foreground">
@@ -534,7 +534,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
                   <Volume2 size={16} className="text-amber-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-amber-800">
+                  <p className="text-base font-semibold text-amber-800">
                     Siapkan kertas & pensil!
                   </p>
                   <p className="text-xs text-amber-700 mt-0.5">
@@ -548,7 +548,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
             {/* Current word card */}
             <Card className="mb-4">
               <CardContent className="p-8 text-center">
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-base text-muted-foreground mb-1">
                   Arti: <span className="font-medium text-foreground">{words[currentIdx]?.meaning}</span>
                 </p>
 
@@ -648,8 +648,8 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
               <CardContent className="p-6">
                 <div className="text-center mb-5">
                   <Mascot size="lg" className="mx-auto mb-3" />
-                  <h3 className="font-bold text-base">Langkah 3: Foto Jawabanmu</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <h3 className="font-bold text-lg">Langkah 3: Foto Jawabanmu</h3>
+                  <p className="text-base text-muted-foreground mt-1">
                     Foto kertas yang berisi tulisan Mandarin-mu. Pastikan tulisan terlihat jelas!
                   </p>
                 </div>
@@ -713,7 +713,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
             <Mascot size="xl" animate />
             <Loader2 className="animate-spin text-primary" size={28} />
             <div className="text-center">
-              <p className="font-semibold text-sm">Memeriksa jawaban...</p>
+              <p className="font-semibold text-base">Memeriksa jawaban...</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {MASCOT_NAME} sedang membandingkan tulisanmu
               </p>

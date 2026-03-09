@@ -138,8 +138,8 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <h2 className="text-xl font-bold">📝 Latihan Ujian</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-bold">📝 Latihan Ujian</h2>
+        <p className="text-base text-muted-foreground">
           Pilih mata pelajaran untuk mulai latihan
         </p>
       </motion.div>
@@ -176,7 +176,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
               >
                 <CardContent className="p-4 flex items-center gap-3">
                   <BookOpen size={20} className="text-primary shrink-0" />
-                  <span className="text-sm font-medium">{subj}</span>
+                  <span className="text-base font-medium">{subj}</span>
                 </CardContent>
               </Card>
             ))}
@@ -227,7 +227,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             {/* Question */}
             <Card className="mb-4">
               <CardContent className="p-5">
-                <p className="font-medium text-base leading-relaxed">
+                <p className="font-medium text-lg leading-relaxed">
                   {questions[currentQ].question}
                 </p>
               </CardContent>
@@ -263,7 +263,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                   >
                     <Button
                       variant={variant}
-                      className={`w-full justify-start h-auto py-3 px-4 text-left text-sm ${extraClass}`}
+                      className={`w-full justify-start h-auto py-3 px-4 text-left text-base ${extraClass}`}
                       onClick={() => handleAnswer(i)}
                       disabled={selected !== null || hearts === 0}
                     >
@@ -293,7 +293,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 >
                   <Card className="bg-blue-50 border-blue-200">
                     <CardContent className="p-4">
-                      <p className="text-sm text-blue-800">
+                      <p className="text-base text-blue-800">
                         <span className="font-semibold">Penjelasan: </span>
                         {questions[currentQ].explanation}
                       </p>
@@ -356,7 +356,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                     ? '👍'
                     : '💪'}
             </motion.div>
-            <h3 className="text-2xl font-bold mb-1">
+            <h3 className="text-3xl font-bold mb-1">
               {totalCorrect}/{questions.length} Benar
             </h3>
 
@@ -371,7 +371,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
               </motion.p>
             )}
 
-            <p className="text-sm text-muted-foreground mb-8">
+            <p className="text-base text-muted-foreground mb-8">
               {totalCorrect === questions.length
                 ? 'Luar biasa! Kamu sempurna!'
                 : totalCorrect >= 4

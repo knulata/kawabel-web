@@ -34,11 +34,11 @@ export function LeaderboardPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <h2 className="text-xl font-bold flex items-center gap-2">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
           <Trophy size={24} className="text-amber-500" />
           Papan Juara
         </h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-base text-muted-foreground">
           Siapa paling rajin belajar?
         </p>
       </motion.div>
@@ -115,7 +115,7 @@ export function LeaderboardPage() {
                     {/* Name */}
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-medium truncate ${
+                        className={`text-base font-medium truncate ${
                           isMe ? 'text-primary' : ''
                         }`}
                       >
@@ -133,7 +133,7 @@ export function LeaderboardPage() {
 
                     {/* Stars */}
                     <div className="text-right shrink-0">
-                      <span className="text-sm font-bold">{entry.stars}</span>
+                      <span className="text-base font-bold">{entry.stars}</span>
                       <span className="text-xs ml-0.5">⭐</span>
                     </div>
                   </CardContent>

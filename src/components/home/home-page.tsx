@@ -119,7 +119,7 @@ export function HomePage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className="text-2xl font-bold text-white"
+              className="text-3xl font-bold text-white"
               style={{ fontFamily: 'var(--font-nunito)' }}
             >
               {firstName ? `Halo ${firstName}!` : 'Kawan Belajar AI-mu'}
@@ -129,7 +129,7 @@ export function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-white/70 text-sm mt-2 max-w-xs mx-auto leading-relaxed"
+              className="text-white/70 text-base mt-2 max-w-xs mx-auto leading-relaxed"
             >
               Tanya PR, foto soal, latihan ujian, dan dikte Mandarin — semua dibantu AI, kapan saja.
             </motion.p>
@@ -141,7 +141,7 @@ export function HomePage() {
               className="mt-5"
             >
               <Link href="/chat" onClick={handleFeatureTap}>
-                <button className="px-6 py-3 bg-white text-primary font-bold rounded-xl shadow-lg text-sm hover:bg-white/90 transition-colors">
+                <button className="px-6 py-3 bg-white text-primary font-bold rounded-xl shadow-lg text-base hover:bg-white/90 transition-colors">
                   Mulai Tanya Sekarang
                 </button>
               </Link>
@@ -159,7 +159,7 @@ export function HomePage() {
               animate="show"
               className="space-y-3"
             >
-              <h3 className="text-sm font-bold text-foreground">
+              <h3 className="text-base font-bold text-foreground">
                 Apa yang bisa {MASCOT_NAME} bantu?
               </h3>
 
@@ -174,10 +174,10 @@ export function HomePage() {
                           {feature.icon}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm text-foreground">
+                          <h3 className="font-semibold text-base text-foreground">
                             {feature.title}
                           </h3>
-                          <p className="text-xs text-muted-foreground mt-0.5">
+                          <p className="text-sm text-muted-foreground mt-0.5">
                             {feature.desc}
                           </p>
                         </div>
@@ -198,7 +198,7 @@ export function HomePage() {
               <Card className="shadow-sm border-border/40 overflow-hidden">
                 <CardContent className="p-0">
                   <div className="bg-muted/30 px-4 py-3 border-b border-border/30">
-                    <h3 className="text-sm font-bold text-foreground">Cara pakai</h3>
+                    <h3 className="text-base font-bold text-foreground">Cara pakai</h3>
                   </div>
                   <div className="p-4 space-y-3">
                     {[
@@ -210,7 +210,7 @@ export function HomePage() {
                         <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
                           {step.num}
                         </div>
-                        <p className="text-sm text-foreground leading-snug">{step.text}</p>
+                        <p className="text-base text-foreground leading-snug">{step.text}</p>
                       </div>
                     ))}
                   </div>
@@ -231,8 +231,8 @@ export function HomePage() {
                       <Sparkles size={20} className="text-primary" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground">Belajar tanpa batas</p>
-                      <p className="text-xs text-muted-foreground">Upgrade ke Premium — gratis 7 hari</p>
+                      <p className="text-base font-semibold text-foreground">Belajar tanpa batas</p>
+                      <p className="text-sm text-muted-foreground">Upgrade ke Premium — gratis 7 hari</p>
                     </div>
                     <ArrowRight size={16} className="text-primary" />
                   </CardContent>
@@ -259,7 +259,7 @@ export function HomePage() {
                 <p className="text-white/50 text-xs font-medium uppercase tracking-widest">
                   {getGreeting()}
                 </p>
-                <h2 className="text-xl font-bold text-white mt-0.5">
+                <h2 className="text-2xl font-bold text-white mt-0.5">
                   {firstName || 'Halo'}! 👋
                 </h2>
               </div>
@@ -338,7 +338,7 @@ export function HomePage() {
 
             {/* Quick actions — horizontal scroll */}
             <div>
-              <h3 className="text-sm font-bold text-foreground mb-3">Lanjut Belajar</h3>
+              <h3 className="text-base font-bold text-foreground mb-3">Lanjut Belajar</h3>
               <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
                 {MAIN_FEATURES.map((feature) => (
                   <Link
@@ -372,7 +372,7 @@ export function HomePage() {
                 transition={{ delay: 0.3 }}
               >
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                  <h3 className="text-base font-bold text-foreground flex items-center gap-1.5">
                     <Sparkles size={14} className="text-amber-500" />
                     Pencapaian
                   </h3>
@@ -432,8 +432,8 @@ export function HomePage() {
                       <Sparkles size={20} className="text-primary" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground">Belajar tanpa batas</p>
-                      <p className="text-xs text-muted-foreground">Upgrade Premium — gratis 7 hari</p>
+                      <p className="text-base font-semibold text-foreground">Belajar tanpa batas</p>
+                      <p className="text-sm text-muted-foreground">Upgrade Premium — gratis 7 hari</p>
                     </div>
                     <ArrowRight size={16} className="text-primary" />
                   </CardContent>

@@ -29,7 +29,7 @@ export function ChatBubble({ message }: ChatBubbleProps) {
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1">
             <Mascot size="xs" />
-            <span className="text-xs font-semibold text-primary">{MASCOT_NAME}</span>
+            <span className="text-sm font-semibold text-primary">{MASCOT_NAME}</span>
           </div>
         )}
 
@@ -41,7 +41,7 @@ export function ChatBubble({ message }: ChatBubbleProps) {
           />
         )}
 
-        <div className="text-sm leading-relaxed whitespace-pre-wrap">
+        <div className="text-base leading-relaxed whitespace-pre-wrap">
           <FormattedText text={message.content} isUser={isUser} />
         </div>
       </div>
