@@ -453,9 +453,9 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
             exit={{ opacity: 0 }}
           >
             <Card className="overflow-hidden">
-              <CardContent className="p-5">
-                <div className="text-center mb-4">
-                  <Mascot size="lg" className="mx-auto mb-2" />
+              <CardContent className="p-4 pt-3">
+                <div className="text-center mb-3">
+                  <Mascot size="lg" className="mx-auto mb-1.5" />
                   <h3 className="font-bold text-lg">Foto Daftar Kata</h3>
                   <p className="text-sm text-muted-foreground mt-1">
                     Foto halaman buku yang berisi kata-kata yang ingin di diktekan
