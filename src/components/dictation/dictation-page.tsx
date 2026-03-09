@@ -317,7 +317,7 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
   // ── Render ──────────────────────────────────────────────────────
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto pb-28 sm:pb-8">
+    <div className="px-4 py-4 max-w-lg mx-auto pb-4 sm:pb-8">
       {/* Hidden file inputs */}
       <input
         ref={wordFileRef}
