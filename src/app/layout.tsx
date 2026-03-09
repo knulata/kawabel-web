@@ -33,15 +33,13 @@ export const metadata: Metadata = {
     description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte Mandarin, dan raih skor tertinggi — gratis!',
     url: 'https://kawabel.com',
     siteName: 'Kawabel',
-    images: [{ url: '/favicon.png', width: 512, height: 512 }],
     locale: 'id_ID',
     type: 'website',
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'Kawabel — Kawan Belajar AI 🦉',
     description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte Mandarin — gratis!',
-    images: ['/favicon.png'],
   },
   appleWebApp: {
     capable: true,
