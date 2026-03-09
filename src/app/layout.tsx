@@ -18,27 +18,30 @@ const nunito = Nunito({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kawabel.com'),
-  title: 'Kawabel — Kawan Belajar',
-  description: 'Teman belajar AI-mu. Tanya PR, latihan ujian, dikte Mandarin, dan banyak lagi!',
+  title: 'Kawabel — Kawan Belajar AI',
+  description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte Mandarin, dan raih skor tertinggi — gratis!',
   manifest: '/manifest.json',
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.png', sizes: '512x512', type: 'image/png' },
     ],
-    apple: '/icons/icon-192.png',
+    apple: '/favicon.png',
   },
   openGraph: {
-    title: 'Kawabel — Kawan Belajar',
-    description: 'Teman belajar AI-mu. Tanya PR, latihan ujian, dikte Mandarin, dan banyak lagi! 🦉',
+    title: 'Kawabel — Kawan Belajar AI 🦉',
+    description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte Mandarin, dan raih skor tertinggi — gratis!',
     url: 'https://kawabel.com',
     siteName: 'Kawabel',
+    images: [{ url: '/favicon.png', width: 512, height: 512 }],
     locale: 'id_ID',
     type: 'website',
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Kawabel — Kawan Belajar',
-    description: 'Teman belajar AI-mu. Tanya PR, latihan ujian, dikte Mandarin!',
+    card: 'summary',
+    title: 'Kawabel — Kawan Belajar AI 🦉',
+    description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte Mandarin — gratis!',
+    images: ['/favicon.png'],
   },
   appleWebApp: {
     capable: true,
