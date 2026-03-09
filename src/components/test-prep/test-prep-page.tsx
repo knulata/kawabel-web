@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { SUBJECTS } from '@/lib/constants';
+import { SCHOOL_TYPES, SUBJECTS_BY_SCHOOL } from '@/lib/constants';
 import { playTap } from '@/lib/sounds';
 import { hapticLight } from '@/lib/haptics';
 import { PermissionGuide, usePermission } from '@/components/chat/permission-guide';
@@ -23,16 +23,34 @@ import {
 } from 'lucide-react';
 import type { TestQuestion } from '@/types';
 
-type Phase = 'select' | 'topic' | 'loading' | 'quiz' | 'results';
+type Phase = 'school' | 'select' | 'topic' | 'loading' | 'quiz' | 'results';
 
 const TOPIC_SUGGESTIONS: Record<string, string[]> = {
-  Matematika: ['Pecahan', 'Perkalian & Pembagian', 'Bangun Ruang', 'Persamaan Linear'],
-  IPA: ['Fotosintesis', 'Sistem Tata Surya', 'Siklus Air', 'Energi & Gaya'],
-  'Bahasa Indonesia': ['Teks Narasi', 'Kata Baku & Tidak Baku', 'Kalimat Efektif', 'Puisi'],
-  'Bahasa Inggris': ['Simple Present Tense', 'Vocabulary: Animals', 'Reading Comprehension', 'Past Tense'],
-  'Bahasa Mandarin': ['Angka & Waktu', 'Perkenalan Diri', 'Keluarga', 'Makanan'],
-  IPS: ['Keragaman Budaya Indonesia', 'Peta & Globe', 'Sejarah Kemerdekaan', 'Ekonomi Sederhana'],
-  PKN: ['Pancasila', 'Hak & Kewajiban', 'Norma di Masyarakat', 'Musyawarah'],
+  // National / shared
+  Matematika: ['Pecahan', 'Perkalian & Pembagian', 'Bangun Ruang', 'Persamaan Linear', 'FPB & KPK', 'Statistika Dasar'],
+  IPA: ['Fotosintesis', 'Sistem Tata Surya', 'Siklus Air', 'Energi & Gaya', 'Sistem Pencernaan', 'Ekosistem'],
+  IPS: ['Keragaman Budaya Indonesia', 'Peta & Globe', 'Sejarah Kemerdekaan', 'Ekonomi Sederhana', 'ASEAN', 'Sumber Daya Alam'],
+  'Bahasa Indonesia': ['Teks Narasi', 'Kata Baku & Tidak Baku', 'Kalimat Efektif', 'Puisi', 'Teks Prosedur', 'Paragraf Argumentasi'],
+  'Bahasa Inggris': ['Simple Present Tense', 'Vocabulary', 'Reading Comprehension', 'Past Tense', 'Comparative & Superlative', 'Writing'],
+  'Bahasa Mandarin': ['Angka & Waktu', 'Perkenalan Diri', 'Keluarga', 'Makanan', 'Arah & Transportasi'],
+  PKN: ['Pancasila', 'Hak & Kewajiban', 'Norma di Masyarakat', 'Musyawarah', 'UUD 1945'],
+  'Seni Budaya': ['Seni Rupa', 'Seni Musik', 'Seni Tari', 'Seni Teater'],
+  PJOK: ['Permainan Bola Besar', 'Atletik', 'Kebugaran Jasmani', 'Renang'],
+  Informatika: ['Algoritma', 'Internet & Keamanan', 'Pengolahan Data', 'Berpikir Komputasional'],
+  // Islamic
+  'Bahasa Arab': ['Perkenalan (تعارف)', 'Angka (الأعداد)', 'Keluarga (الأسرة)', 'Sekolah (المدرسة)', 'Fi\'il & Isim'],
+  'Al-Quran & Hadits': ['Hukum Tajwid', 'Surah-surah Pendek', 'Hadits tentang Akhlak', 'Makharijul Huruf'],
+  Fiqih: ['Thaharah (Bersuci)', 'Shalat', 'Puasa', 'Zakat', 'Haji & Umrah'],
+  'Aqidah Akhlak': ['Iman kepada Allah', 'Akhlak Terpuji', 'Asmaul Husna', 'Kisah Nabi'],
+  'Sejarah Kebudayaan Islam': ['Sejarah Nabi Muhammad', 'Khulafaur Rasyidin', 'Peradaban Islam', 'Islam di Indonesia'],
+  // International
+  Mathematics: ['Fractions', 'Algebra', 'Geometry', 'Statistics', 'Number Patterns', 'Ratios'],
+  Science: ['Photosynthesis', 'Solar System', 'Forces & Energy', 'Human Body', 'Matter & Materials', 'Ecosystems'],
+  English: ['Grammar', 'Reading Comprehension', 'Vocabulary', 'Creative Writing', 'Tenses', 'Idioms & Phrases'],
+  'Social Studies': ['World Geography', 'Ancient Civilizations', 'Government & Civics', 'Economics Basics'],
+  'ICT / Computing': ['Algorithms', 'Internet Safety', 'Spreadsheets', 'Coding Basics'],
+  'Art & Design': ['Color Theory', 'Art History', 'Design Principles', 'Famous Artists'],
+  'Physical Education': ['Sports Rules', 'Health & Nutrition', 'Fitness Concepts'],
 };
 
 export function TestPrepPage() {
@@ -43,7 +61,8 @@ export function TestPrepPage() {
   const cameraPerm = usePermission('camera');
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [showPermGuide, setShowPermGuide] = useState(false);
-  const [phase, setPhase] = useState<Phase>('select');
+  const [phase, setPhase] = useState<Phase>('school');
+  const [schoolType, setSchoolType] = useState('');
   const [subject, setSubject] = useState('');
   const [topic, setTopic] = useState('');
   const [bookImages, setBookImages] = useState<string[]>([]);
@@ -255,11 +274,13 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
       >
         <h2 className="text-2xl font-bold">📝 Latihan Ujian</h2>
         <p className="text-base text-muted-foreground">
-          {phase === 'select'
-            ? 'Pilih mata pelajaran untuk mulai latihan'
-            : phase === 'topic'
-              ? `${subject} — foto buku atau pilih topik`
-              : ''}
+          {phase === 'school'
+            ? 'Pilih jenis sekolah'
+            : phase === 'select'
+              ? 'Pilih mata pelajaran'
+              : phase === 'topic'
+                ? `${subject} — foto buku atau pilih topik`
+                : ''}
         </p>
       </motion.div>
 
@@ -289,6 +310,36 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
+        {/* ── School type selection ── */}
+        {phase === 'school' && (
+          <motion.div
+            key="school"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="space-y-3"
+          >
+            {SCHOOL_TYPES.map((school) => (
+              <Card
+                key={school.id}
+                className="card-hover cursor-pointer"
+                onClick={() => {
+                  playTap();
+                  hapticLight();
+                  setSchoolType(school.id);
+                  setPhase('select');
+                }}
+              >
+                <CardContent className="p-4 flex items-center gap-4">
+                  <span className="text-2xl">{school.emoji}</span>
+                  <span className="text-base font-semibold">{school.label}</span>
+                  <ArrowRight size={16} className="ml-auto text-muted-foreground/50" />
+                </CardContent>
+              </Card>
+            ))}
+          </motion.div>
+        )}
+
         {/* ── Subject selection ── */}
         {phase === 'select' && (
           <motion.div
@@ -296,20 +347,28 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="grid grid-cols-2 gap-3"
           >
-            {SUBJECTS.map((subj) => (
-              <Card
-                key={subj}
-                className="card-hover cursor-pointer"
-                onClick={() => selectSubject(subj)}
-              >
-                <CardContent className="p-4 flex items-center gap-3">
-                  <BookOpen size={20} className="text-primary shrink-0" />
-                  <span className="text-base font-medium">{subj}</span>
-                </CardContent>
-              </Card>
-            ))}
+            <button
+              onClick={() => setPhase('school')}
+              className="text-sm text-primary font-medium mb-3 flex items-center gap-1 hover:underline"
+            >
+              <ChevronLeft size={14} />
+              Ganti jenis sekolah
+            </button>
+            <div className="grid grid-cols-2 gap-3">
+              {(SUBJECTS_BY_SCHOOL[schoolType] || []).map((subj) => (
+                <Card
+                  key={subj}
+                  className="card-hover cursor-pointer"
+                  onClick={() => selectSubject(subj)}
+                >
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <BookOpen size={20} className="text-primary shrink-0" />
+                    <span className="text-base font-medium">{subj}</span>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </motion.div>
         )}
 

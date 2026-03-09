@@ -63,15 +63,33 @@ export const FEATURES = [
   },
 ] as const;
 
-export const SUBJECTS = [
-  'Matematika',
-  'IPA',
-  'Bahasa Indonesia',
-  'Bahasa Inggris',
-  'Bahasa Mandarin',
-  'IPS',
-  'PKN',
+export const SCHOOL_TYPES = [
+  { id: 'nasional', label: 'Sekolah Nasional', emoji: '🇮🇩' },
+  { id: 'islam', label: 'Sekolah Islam', emoji: '🕌' },
+  { id: 'internasional', label: 'Sekolah Internasional', emoji: '🌍' },
 ] as const;
+
+export const SUBJECTS_BY_SCHOOL: Record<string, string[]> = {
+  nasional: [
+    'Matematika', 'IPA', 'IPS', 'Bahasa Indonesia', 'Bahasa Inggris',
+    'Bahasa Mandarin', 'PKN', 'Seni Budaya', 'PJOK', 'Informatika',
+  ],
+  islam: [
+    'Matematika', 'IPA', 'IPS', 'Bahasa Indonesia', 'Bahasa Inggris',
+    'Bahasa Arab', 'Al-Quran & Hadits', 'Fiqih', 'Aqidah Akhlak',
+    'Sejarah Kebudayaan Islam', 'PKN',
+  ],
+  internasional: [
+    'Mathematics', 'Science', 'English', 'Bahasa Indonesia',
+    'Bahasa Mandarin', 'Social Studies', 'ICT / Computing',
+    'Art & Design', 'Physical Education',
+  ],
+};
+
+// Flat list for backward compatibility
+export const SUBJECTS = [
+  ...new Set(Object.values(SUBJECTS_BY_SCHOOL).flat()),
+] as string[];
 
 export const GRADES = [
   'SD Kelas 1', 'SD Kelas 2', 'SD Kelas 3',
