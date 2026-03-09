@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Mascot } from '@/components/mascot';
 import { useSubscription } from '@/store/use-subscription';
-import { SUBSCRIPTION_PRICE, BCA_ACCOUNT, BCA_NAME } from '@/lib/constants';
+import { FIRST_MONTH_PRICE, SUBSCRIPTION_PRICE, BCA_ACCOUNT, BCA_NAME } from '@/lib/constants';
 import {
   Copy,
   Check,
@@ -165,9 +165,17 @@ export function PaymentSheet({ open, onOpenChange }: PaymentSheetProps) {
                       <Banknote size={20} className="text-white" />
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Jumlah Transfer</p>
-                      <p className="font-bold text-foreground text-lg">
-                        Rp {formatPrice(SUBSCRIPTION_PRICE)}
+                      <p className="text-xs text-muted-foreground">Jumlah Transfer (bulan pertama)</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="font-bold text-foreground text-lg">
+                          Rp {formatPrice(FIRST_MONTH_PRICE)}
+                        </p>
+                        <span className="text-sm text-muted-foreground line-through">
+                          Rp {formatPrice(SUBSCRIPTION_PRICE)}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Selanjutnya Rp {formatPrice(SUBSCRIPTION_PRICE)}/bulan
                       </p>
                     </div>
                   </div>

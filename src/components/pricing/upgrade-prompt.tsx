@@ -138,7 +138,8 @@ export function UpgradePrompt({ open, feature, onDismiss }: UpgradePromptProps) 
                   transition={{ delay: 0.35 }}
                   className="text-xs text-muted-foreground"
                 >
-                  Gratis 7 hari pertama!
+
+                  Gratis 7 hari + bulan pertama cuma Rp 49rb!
                 </motion.p>
               </div>
             </div>

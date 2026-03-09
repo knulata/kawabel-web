@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { Mascot } from '@/components/mascot';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/store/use-subscription';
-import { SUBSCRIPTION_PRICE } from '@/lib/constants';
+import { SUBSCRIPTION_PRICE, FIRST_MONTH_PRICE } from '@/lib/constants';
 import { PaymentSheet } from '@/components/pricing/payment-sheet';
 import {
   Check,
@@ -22,6 +23,8 @@ import {
   ChevronDown,
   Crown,
   Sparkles,
+  Handshake,
+  Zap,
 } from 'lucide-react';
 
 const container = {
@@ -51,7 +54,7 @@ const COMPARISON: FeatureRow[] = [
   { icon: <Heart size={16} />, label: 'Hati (nyawa)', free: '5 hati', premium: 'Unlimited', freeCheck: true, premiumCheck: true },
   { icon: <Megaphone size={16} />, label: 'Tanpa iklan', free: '', premium: '', freeCheck: false, premiumCheck: true },
   { icon: <BarChart3 size={16} />, label: 'Laporan WhatsApp', free: '', premium: '', freeCheck: false, premiumCheck: true },
-  { icon: <GraduationCap size={16} />, label: 'Akses bimbel', free: '', premium: '', freeCheck: false, premiumCheck: true },
+  { icon: <GraduationCap size={16} />, label: 'Kurikulum lengkap', free: '', premium: '', freeCheck: false, premiumCheck: true },
 ];
 
 const FAQ_ITEMS = [
@@ -64,12 +67,20 @@ const FAQ_ITEMS = [
     a: 'Pembayaran melalui transfer bank BCA. Setelah transfer, upload bukti pembayaran dan tim kami akan verifikasi dalam 1x24 jam.',
   },
   {
+    q: 'Kenapa bulan pertama lebih murah?',
+    a: 'Kami ingin kamu merasakan manfaat Kawabel dulu. Bulan pertama hanya Rp 49.000 supaya kamu bisa coba tanpa risiko. Setelah itu Rp 99.000/bulan.',
+  },
+  {
     q: 'Apa yang terjadi setelah masa percobaan?',
     a: 'Kamu tetap bisa menggunakan Kawabel dengan batasan harian (5 chat, 2 foto PR, 2 kuis, 3 dikte per hari). Upgrade kapan saja untuk akses unlimited.',
   },
   {
     q: 'Bisa berhenti berlangganan?',
     a: 'Tentu! Langganan tidak diperpanjang otomatis. Setelah masa aktif berakhir, kamu kembali ke paket gratis.',
+  },
+  {
+    q: 'Saya punya bimbel, bisa kerja sama?',
+    a: 'Bisa! Kami punya program khusus untuk bimbel dan sekolah dengan harga spesial per siswa. Kunjungi halaman Partner kami untuk info lebih lanjut.',
   },
   {
     q: 'Apa itu Laporan WhatsApp?',
@@ -116,18 +127,9 @@ function formatPrice(price: number): string {
 
 export function PricingPage() {
   const [showPayment, setShowPayment] = useState(false);
-  const { isPremium, plan, trialDaysLeft, startTrial } = useSubscription();
+  const { isPremium, plan, trialDaysLeft } = useSubscription();
   const premium = isPremium();
   const daysLeft = trialDaysLeft();
-
-  const handleCTA = () => {
-    if (plan === 'free' && !premium) {
-      // Start trial first, then show payment for after trial
-      setShowPayment(true);
-    } else {
-      setShowPayment(true);
-    }
-  };
 
   return (
     <div className="px-4 py-5 pb-24 sm:pb-8 space-y-6 max-w-xl mx-auto">
@@ -160,7 +162,7 @@ export function PricingPage() {
           transition={{ delay: 0.2 }}
           className="text-sm text-muted-foreground mt-1"
         >
-          Pilih paket yang cocok untuk anak Anda
+          Lebih murah dari 1x makan siang!
         </motion.p>
       </motion.div>
 
@@ -213,9 +215,10 @@ export function PricingPage() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', delay: 0.3 }}
-                className="px-3 py-1 rounded-full bg-primary text-white text-xs font-bold shadow-md"
+                className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-bold shadow-md flex items-center gap-1"
               >
-                Gratis 7 hari pertama!
+                <Zap size={12} />
+                Bulan pertama cuma Rp 49rb!
               </motion.div>
             </div>
 
@@ -229,10 +232,22 @@ export function PricingPage() {
                   </span>
                 )}
               </div>
-              <p className="text-2xl font-black text-foreground mb-1">
-                Rp {formatPrice(SUBSCRIPTION_PRICE)}
-                <span className="text-sm font-normal text-muted-foreground">/bulan</span>
-              </p>
+
+              {/* Price with promo */}
+              <div className="mb-1">
+                <div className="flex items-baseline gap-2">
+                  <p className="text-2xl font-black text-foreground">
+                    Rp {formatPrice(FIRST_MONTH_PRICE)}
+                  </p>
+                  <span className="text-sm text-muted-foreground line-through">
+                    Rp {formatPrice(SUBSCRIPTION_PRICE)}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  bulan pertama, lalu Rp {formatPrice(SUBSCRIPTION_PRICE)}/bulan
+                </p>
+              </div>
+
               <p className="text-xs text-muted-foreground mb-4">Akses penuh tanpa batas</p>
 
               <div className="space-y-2">
@@ -258,18 +273,57 @@ export function PricingPage() {
                     </p>
                   </div>
                 ) : (
-                  <Button
-                    onClick={handleCTA}
-                    className="w-full h-12 text-base font-bold rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md"
-                  >
-                    <Crown size={18} className="mr-2" />
-                    Mulai Berlangganan
-                  </Button>
+                  <>
+                    <Button
+                      onClick={() => setShowPayment(true)}
+                      className="w-full h-12 text-base font-bold rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md"
+                    >
+                      <Crown size={18} className="mr-2" />
+                      Mulai Rp {formatPrice(FIRST_MONTH_PRICE)}/bulan
+                    </Button>
+                    <p className="text-center text-xs text-muted-foreground mt-2">
+                      + gratis 7 hari pertama!
+                    </p>
+                  </>
                 )}
               </motion.div>
             </CardContent>
           </Card>
         </motion.div>
+      </motion.div>
+
+      {/* Social proof */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100"
+      >
+        <p className="text-sm text-green-800 font-medium text-center">
+          Lebih hemat dari les privat (Rp 200rb/pertemuan). Kawabel siap bantu 24/7 kapan saja.
+        </p>
+      </motion.div>
+
+      {/* Partner CTA */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+      >
+        <Link href="/partner">
+          <Card className="shadow-sm border-blue-200/50 bg-gradient-to-r from-blue-50 to-indigo-50 card-hover">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                <Handshake size={20} className="text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-blue-900">Punya bimbel atau sekolah?</p>
+                <p className="text-xs text-blue-700">Daftar sebagai Partner — harga spesial per siswa</p>
+              </div>
+              <ChevronDown size={16} className="text-blue-400 -rotate-90 shrink-0" />
+            </CardContent>
+          </Card>
+        </Link>
       </motion.div>
 
       {/* FAQ */}

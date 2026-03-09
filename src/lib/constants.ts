@@ -87,7 +87,9 @@ export const FREE_LIMITS = {
   dictations: 3,
 } as const;
 
-export const SUBSCRIPTION_PRICE = 1_600_000;
+export const SUBSCRIPTION_PRICE = 99_000;
+export const FIRST_MONTH_PRICE = 49_000;
 export const TRIAL_DAYS = 7;
 export const BCA_ACCOUNT = '3722808999';
 export const BCA_NAME = 'Indonesia Technologies V';
+export const WHATSAPP_ADMIN = '628131102445';
