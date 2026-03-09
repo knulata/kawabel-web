@@ -59,7 +59,9 @@ export function DictationPage() {
   const [answerImage, setAnswerImage] = useState<string | null>(null);
 
   const wordFileRef = useRef<HTMLInputElement>(null);
+  const wordGalleryRef = useRef<HTMLInputElement>(null);
   const answerFileRef = useRef<HTMLInputElement>(null);
+  const answerGalleryRef = useRef<HTMLInputElement>(null);
 
   // ── Phase 1: Upload word list photo ──────────────────────────────
 
@@ -309,6 +311,21 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
         onChange={handleAnswerSelect}
         className="hidden"
       />
+      {/* Gallery inputs (no capture — opens photo picker) */}
+      <input
+        ref={wordGalleryRef}
+        type="file"
+        accept="image/*"
+        onChange={handleWordListSelect}
+        className="hidden"
+      />
+      <input
+        ref={answerGalleryRef}
+        type="file"
+        accept="image/*"
+        onChange={handleAnswerSelect}
+        className="hidden"
+      />
 
       {/* Header */}
       <motion.div
@@ -472,9 +489,12 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
                   Foto Daftar Kata
                 </Button>
 
-                <p className="text-center text-xs text-muted-foreground mt-3">
-                  Bisa juga pilih foto dari galeri
-                </p>
+                <button
+                  onClick={() => wordGalleryRef.current?.click()}
+                  className="w-full text-center text-xs text-primary font-medium mt-3 hover:underline"
+                >
+                  Atau pilih foto dari galeri
+                </button>
               </CardContent>
             </Card>
           </motion.div>
@@ -689,6 +709,13 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
                   <Camera size={22} />
                   Foto Jawaban
                 </Button>
+
+                <button
+                  onClick={() => answerGalleryRef.current?.click()}
+                  className="w-full text-center text-xs text-primary font-medium mt-3 hover:underline"
+                >
+                  Atau pilih foto dari galeri
+                </button>
 
                 <button
                   onClick={() => setPhase('dictation')}
