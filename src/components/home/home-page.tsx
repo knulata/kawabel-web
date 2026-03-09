@@ -18,7 +18,7 @@ import { FriendsSection } from '@/components/home/friends-section';
 import { AchievementToast } from '@/components/home/achievement-toast';
 import { TrialBanner } from '@/components/pricing/trial-banner';
 import { Card, CardContent } from '@/components/ui/card';
-import { Zap, ArrowRight, Sparkles, MessageCircle, Camera, PenLine, BookOpen } from 'lucide-react';
+import { Zap, ArrowRight, Sparkles } from 'lucide-react';
 
 const container = {
   hidden: {},
@@ -36,33 +36,33 @@ const MAIN_FEATURES = [
     id: 'chat',
     title: 'Tanya PR',
     desc: 'Ketik pertanyaan, langsung dijawab',
-    icon: <MessageCircle size={22} />,
+    emoji: '💬',
     href: '/chat',
     gradient: 'from-green-400 to-emerald-600',
   },
   {
     id: 'photo',
     title: 'Foto Soal',
-    desc: 'Foto soal dari buku, AI bantu jawab',
-    icon: <Camera size={22} />,
+    desc: 'Foto soal dari buku, bantu jawab',
+    emoji: '📸',
     href: '/chat?photo=1',
-    gradient: 'from-blue-400 to-blue-600',
+    gradient: 'from-sky-400 to-blue-600',
   },
   {
     id: 'dictation',
     title: 'Dikte Mandarin',
     desc: 'Foto daftar kata, dengarkan & tulis',
-    icon: <PenLine size={22} />,
+    emoji: '🀄',
     href: '/dictation',
-    gradient: 'from-red-400 to-rose-600',
+    gradient: 'from-rose-400 to-red-600',
   },
   {
     id: 'test',
     title: 'Latihan Ujian',
-    desc: 'Kuis pilihan ganda semua mata pelajaran',
-    icon: <BookOpen size={22} />,
+    desc: 'Foto buku atau pilih topik, langsung kuis',
+    emoji: '📝',
     href: '/test-prep',
-    gradient: 'from-purple-400 to-purple-600',
+    gradient: 'from-violet-400 to-purple-600',
   },
 ];
 
@@ -169,9 +169,9 @@ export function HomePage() {
                     <Card className="card-hover shadow-sm border-border/40 group">
                       <CardContent className="p-4 flex items-center gap-4">
                         <div
-                          className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center text-white shrink-0 shadow-sm group-hover:scale-105 transition-transform`}
+                          className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 transition-transform`}
                         >
-                          {feature.icon}
+                          <span className="text-2xl">{feature.emoji}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-base text-foreground">
@@ -350,9 +350,9 @@ export function HomePage() {
                     <Card className="card-hover shadow-sm border-border/40 w-32">
                       <CardContent className="p-3 text-center">
                         <div
-                          className={`w-10 h-10 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center text-white mx-auto mb-2 shadow-sm`}
+                          className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mx-auto mb-2 shadow-md`}
                         >
-                          {feature.icon}
+                          <span className="text-xl">{feature.emoji}</span>
                         </div>
                         <p className="text-xs font-semibold text-foreground leading-tight">
                           {feature.title}
