@@ -31,8 +31,8 @@ export const FEATURES = [
   },
   {
     id: 'dictation',
-    title: '听写 Dikte',
-    subtitle: 'Latihan tulis Mandarin',
+    title: 'Dikte',
+    subtitle: 'Dengarkan & tulis kata',
     icon: '✍️',
     href: '/dictation',
     gradient: 'from-red-400 to-rose-600',

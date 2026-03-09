@@ -19,7 +19,7 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   metadataBase: new URL('https://kawabel.com'),
   title: 'Kawabel — Kawan Belajar AI',
-  description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte Mandarin, dan raih skor tertinggi — gratis!',
+  description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte, dan raih skor tertinggi — gratis!',
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Kawabel — Kawan Belajar AI 🦉',
-    description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte Mandarin, dan raih skor tertinggi — gratis!',
+    description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte, dan raih skor tertinggi — gratis!',
     url: 'https://kawabel.com',
     siteName: 'Kawabel',
     locale: 'id_ID',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Kawabel — Kawan Belajar AI 🦉',
-    description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte Mandarin — gratis!',
+    description: 'Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte — gratis!',
   },
   appleWebApp: {
     capable: true,

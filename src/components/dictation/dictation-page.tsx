@@ -27,8 +27,8 @@ import {
 } from 'lucide-react';
 
 interface DictationWord {
-  chinese: string;
-  pinyin: string;
+  word: string;
+  pronunciation: string;
   meaning: string;
 }
 
@@ -49,6 +49,8 @@ export function DictationPage() {
 
   const [phase, setPhase] = useState<Phase>('upload');
   const [words, setWords] = useState<DictationWord[]>([]);
+  const [detectedLang, setDetectedLang] = useState<string>('zh-CN');
+  const [detectedSubject, setDetectedSubject] = useState<string>('Dikte');
   const [currentIdx, setCurrentIdx] = useState(0);
   const [spokenIndices, setSpokenIndices] = useState<Set<number>>(new Set());
   const [results, setResults] = useState<CheckResult[]>([]);
@@ -113,9 +115,21 @@ export function DictationPage() {
             content: [
               {
                 type: 'text' as const,
-                text: `Look at this image of Chinese vocabulary words. Extract ALL the Chinese characters/words you see.
-Reply ONLY with a JSON array: [{"chinese":"字","pinyin":"zì","meaning":"character/word"}]
-Include pinyin with tone marks and Indonesian meaning for each word. Extract every word visible.`,
+                text: `Look at this image of vocabulary words. Auto-detect the language (could be Chinese, Arabic, English, Indonesian, or any other language).
+
+Reply ONLY with a JSON object:
+{
+  "lang": "zh-CN" or "ar-SA" or "en-US" or "id-ID" or other BCP-47 code,
+  "subject": "Bahasa Mandarin" or "Bahasa Arab" or "Bahasa Inggris" or "Bahasa Indonesia" etc,
+  "words": [{"word":"字","pronunciation":"zì","meaning":"huruf/karakter"}]
+}
+
+For Chinese: "word" is the character, "pronunciation" is pinyin with tone marks.
+For Arabic: "word" is the Arabic text, "pronunciation" is transliteration.
+For English: "word" is the English word, "pronunciation" is phonetic.
+For other languages: adapt accordingly.
+"meaning" should always be in Indonesian.
+Extract every word visible.`,
               },
               { type: 'image_url' as const, image_url: { url: wordListImage } },
             ],
@@ -129,16 +143,26 @@ Include pinyin with tone marks and Indonesian meaning for each word. Extract eve
         result.reply.replace(/```json?\n?/g, '').replace(/```/g, '').trim(),
       );
 
-      if (!Array.isArray(parsed) || parsed.length === 0) {
+      const wordList = parsed.words || parsed;
+      if (!Array.isArray(wordList) || wordList.length === 0) {
         throw new Error('Tidak ada kata yang terdeteksi');
       }
 
-      setWords(parsed);
+      // Normalize old format (chinese/pinyin) to new format (word/pronunciation)
+      const normalized = wordList.map((w: Record<string, string>) => ({
+        word: w.word || w.chinese || '',
+        pronunciation: w.pronunciation || w.pinyin || '',
+        meaning: w.meaning || '',
+      }));
+
+      setDetectedLang(parsed.lang || 'zh-CN');
+      setDetectedSubject(parsed.subject || 'Dikte');
+      setWords(normalized);
       setCurrentIdx(0);
       setSpokenIndices(new Set());
       setPhase('dictation');
     } catch {
-      setError('Gagal membaca kata dari foto. Pastikan foto jelas dan berisi kata-kata Mandarin.');
+      setError('Gagal membaca kata dari foto. Pastikan foto jelas dan berisi kata-kata yang ingin di diktekan.');
       setPhase('upload');
     }
   }, [student, wordListImage, incrementUsage]);
@@ -155,8 +179,8 @@ Include pinyin with tone marks and Indonesian meaning for each word. Extract eve
   const speak = (text: string) => {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
-    utterance.rate = 0.7;
+    utterance.lang = detectedLang;
+    utterance.rate = detectedLang.startsWith('zh') ? 0.7 : 0.8;
     speechSynthesis.speak(utterance);
     playTap();
     hapticLight();
@@ -165,7 +189,7 @@ Include pinyin with tone marks and Indonesian meaning for each word. Extract eve
 
   const speakCurrent = () => {
     if (words[currentIdx]) {
-      speak(words[currentIdx].chinese);
+      speak(words[currentIdx].word);
     }
   };
 
@@ -204,7 +228,7 @@ Include pinyin with tone marks and Indonesian meaning for each word. Extract eve
     setPhase('checking');
     setError(null);
 
-    const wordList = words.map((w, i) => `${i + 1}. ${w.chinese} (${w.pinyin})`).join('\n');
+    const wordList = words.map((w, i) => `${i + 1}. ${w.word} (${w.pronunciation})`).join('\n');
 
     try {
       const result = await sendChat(
@@ -214,12 +238,12 @@ Include pinyin with tone marks and Indonesian meaning for each word. Extract eve
             content: [
               {
                 type: 'text' as const,
-                text: `I gave a Chinese dictation test. Here are the expected words:
+                text: `I gave a dictation test in ${detectedSubject}. Here are the expected words:
 ${wordList}
 
 Now look at the student's handwritten answers in this photo. Compare each answer to the expected word.
-Reply ONLY with JSON array: [{"word":"written_char","expected":"正确","correct":true/false,"feedback":"short feedback in Indonesian"}]
-Be lenient with minor stroke imperfections but check character accuracy. Match answers in order (1st written = 1st expected, etc).`,
+Reply ONLY with JSON array: [{"word":"written_char","expected":"expected_word","correct":true/false,"feedback":"short feedback in Indonesian"}]
+Be lenient with minor imperfections but check accuracy. Match answers in order (1st written = 1st expected, etc).`,
               },
               { type: 'image_url' as const, image_url: { url: answerImage } },
             ],
@@ -251,8 +275,8 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
         try {
           await saveProgress({
             student_id: student.id,
-            subject: 'Bahasa Mandarin',
-            topic: '听写 Dictation',
+            subject: detectedSubject,
+            topic: 'Dikte',
             score: correctCount,
             total: words.length,
             type: 'dictation',
@@ -333,7 +357,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <h2 className="text-2xl font-bold">✍️ 听写 Dikte Mandarin</h2>
+        <h2 className="text-2xl font-bold">✍️ Dikte</h2>
         <p className="text-base text-muted-foreground">
           Foto → Dengarkan → Tulis → Periksa
         </p>
@@ -434,7 +458,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
                   <Mascot size="lg" className="mx-auto mb-3" />
                   <h3 className="font-bold text-lg">Langkah 1: Foto Daftar Kata</h3>
                   <p className="text-base text-muted-foreground mt-1">
-                    Foto halaman buku yang berisi kata-kata Mandarin yang ingin di diktekan
+                    Foto halaman buku yang berisi kata-kata yang ingin di diktekan
                   </p>
                 </div>
 
@@ -447,7 +471,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
                   <ol className="space-y-2 text-base text-blue-800">
                     <li className="flex gap-2">
                       <span className="font-bold text-blue-600">1.</span>
-                      <span>Buka buku pelajaran Mandarin di halaman daftar kata (听写词语)</span>
+                      <span>Buka buku pelajaran di halaman daftar kata yang ingin di diktekan</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="font-bold text-blue-600">2.</span>
@@ -514,7 +538,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
             <div className="text-center">
               <p className="font-semibold text-base">Membaca kata dari foto...</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {MASCOT_NAME} sedang mengenali karakter Mandarin
+                {MASCOT_NAME} sedang mengenali kata-kata dari foto
               </p>
             </div>
           </motion.div>
@@ -670,7 +694,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
                   <Mascot size="lg" className="mx-auto mb-3" />
                   <h3 className="font-bold text-lg">Langkah 3: Foto Jawabanmu</h3>
                   <p className="text-base text-muted-foreground mt-1">
-                    Foto kertas yang berisi tulisan Mandarin-mu. Pastikan tulisan terlihat jelas!
+                    Foto kertas yang berisi tulisanmu. Pastikan tulisan terlihat jelas!
                   </p>
                 </div>
 
@@ -832,7 +856,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
                           <span className="text-base font-bold">{r.expected}</span>
                           {words[i] && (
                             <span className="text-xs text-muted-foreground">
-                              ({words[i].pinyin})
+                              ({words[i].pronunciation})
                             </span>
                           )}
                         </div>

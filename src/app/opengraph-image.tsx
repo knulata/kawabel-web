@@ -108,7 +108,7 @@ export default function OGImage() {
               lineHeight: 1.5,
             }}
           >
-            Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte Mandarin — gratis!
+            Foto PR-mu, langsung dijawab AI. Latihan ujian, dikte — gratis!
           </div>
           <div
             style={{

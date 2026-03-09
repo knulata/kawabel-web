@@ -44,7 +44,7 @@ const MAIN_FEATURES = [
   },
   {
     id: 'dictation',
-    title: 'Dikte Mandarin',
+    title: 'Dikte',
     desc: 'Foto daftar kata, dengarkan & tulis',
     emoji: '🀄',
     href: '/dictation',
@@ -126,7 +126,7 @@ export function HomePage() {
               transition={{ delay: 0.2 }}
               className="text-white/70 text-sm mt-2 max-w-xs mx-auto leading-relaxed"
             >
-              Tanya PR, foto soal, latihan ujian, dan dikte Mandarin — semua dibantu AI, kapan saja.
+              Tanya PR, foto soal, latihan ujian, dan dikte — semua dibantu AI, kapan saja.
             </motion.p>
 
             <motion.div

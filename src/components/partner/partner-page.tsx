@@ -204,7 +204,7 @@ export function PartnerPage() {
             transition={{ delay: 0.25 }}
             className="text-base text-muted-foreground mt-3 max-w-md mx-auto"
           >
-            Berikan siswa Anda teman belajar AI 24/7 yang membantu PR, latihan ujian, dan dikte Mandarin — langsung dari HP mereka.
+            Berikan siswa Anda teman belajar AI 24/7 yang membantu PR, latihan ujian, dan dikte — langsung dari HP mereka.
           </motion.p>
 
           <motion.div
@@ -327,7 +327,7 @@ export function PartnerPage() {
           <div className="space-y-2.5">
             {[
               'Bimbingan belajar (bimbel) — tambahkan AI tutor sebagai layanan ekstra',
-              'Kursus Bahasa Mandarin — fitur dikte 听写 otomatis dari buku',
+              'Kursus bahasa — fitur dikte otomatis dari buku (Mandarin, Arab, Inggris, dll)',
               'Les privat — siswa bisa belajar mandiri di antara jadwal les',
               'Sekolah swasta — lengkapi kurikulum dengan bantuan AI',
               'Home schooling community — alat bantu belajar untuk anak',
