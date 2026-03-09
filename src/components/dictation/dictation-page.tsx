@@ -474,7 +474,7 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                   <ol className="space-y-2 text-base text-blue-800">
                     <li className="flex gap-2">
                       <span className="font-bold text-blue-600">1.</span>
-                      <span>Buka buku pelajaran di halaman daftar kata yang ingin di diktekan</span>
+                      <span>Siapkan halaman daftar kata yang ingin di diktekan</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="font-bold text-blue-600">2.</span>
