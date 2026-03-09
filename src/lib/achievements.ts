@@ -97,7 +97,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: 'NIGHT_OWL',
     name: 'Burung Hantu',
     description: 'Belajar setelah jam 10 malam',
-    icon: '🦉',
+    icon: '🌙',
     xpReward: 15,
   },
   {

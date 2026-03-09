@@ -17,10 +17,29 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://kawabel.com'),
   title: 'Kawabel — Kawan Belajar',
   description: 'Teman belajar AI-mu. Tanya PR, latihan ujian, dikte Mandarin, dan banyak lagi!',
   manifest: '/manifest.json',
-  icons: { icon: '/favicon.png', apple: '/icons/icon-192.png' },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/icons/icon-192.png',
+  },
+  openGraph: {
+    title: 'Kawabel — Kawan Belajar',
+    description: 'Teman belajar AI-mu. Tanya PR, latihan ujian, dikte Mandarin, dan banyak lagi! 🦉',
+    url: 'https://kawabel.com',
+    siteName: 'Kawabel',
+    locale: 'id_ID',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Kawabel — Kawan Belajar',
+    description: 'Teman belajar AI-mu. Tanya PR, latihan ujian, dikte Mandarin!',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',

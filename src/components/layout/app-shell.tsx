@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { HeartsDisplay } from '@/components/home/hearts-display';
+import { Mascot } from '@/components/mascot';
 
 const NAV_ITEMS = [
   { href: '/', icon: Home, label: 'Beranda' },
@@ -52,7 +53,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 glass border-b border-border/50">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2" onClick={handleNavTap}>
-            <span className="text-2xl">🦉</span>
+            <Mascot size="md" />
             <span
               className="text-xl font-black kawabel-gradient-text tracking-wide hidden sm:inline"
               style={{ fontFamily: 'var(--font-nunito)' }}

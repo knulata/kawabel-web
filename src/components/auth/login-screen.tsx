@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useStudent } from '@/store/use-student';
 import { loginWithGoogle } from '@/lib/api';
+import { Mascot, MASCOT_NAME } from '@/components/mascot';
 
 declare global {
   interface Window {
@@ -83,7 +84,7 @@ export function LoginScreen() {
           transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
           className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg"
         >
-          <span className="text-5xl">🦉</span>
+          <Mascot size="xl" />
         </motion.div>
 
         {/* Title */}
@@ -112,7 +113,7 @@ export function LoginScreen() {
           transition={{ delay: 0.4 }}
           className="mt-2 text-white/60 text-sm"
         >
-          Masuk untuk mulai belajar dengan Kawi
+          Masuk untuk mulai belajar dengan Kawai
         </motion.p>
 
         {/* Error message */}

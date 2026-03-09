@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ChatBubble } from '@/components/chat/chat-bubble';
 import { PermissionGuide, usePermission } from '@/components/chat/permission-guide';
+import { Mascot, MASCOT_NAME } from '@/components/mascot';
 
 export function ChatPage() {
   const { student } = useStudent();
@@ -163,10 +164,10 @@ export function ChatPage() {
       {/* Chat header */}
       <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xl">🦉</span>
+          <Mascot size="md" />
           <div>
-            <h2 className="font-semibold text-sm">Kawi</h2>
-            <p className="text-xs text-muted-foreground">Teman belajarmu</p>
+            <h2 className="font-semibold text-sm">{MASCOT_NAME}</h2>
+            <p className="text-xs text-muted-foreground">Teman belajar AI-mu</p>
           </div>
         </div>
         {messages.length > 0 && (
@@ -194,9 +195,9 @@ export function ChatPage() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center h-full text-center"
           >
-            <span className="text-6xl mb-4">🦉</span>
+            <Mascot size="2xl" className="mb-4" />
             <h3 className="text-lg font-semibold text-foreground">
-              Halo! Aku Kawi
+              Halo! Aku {MASCOT_NAME}
             </h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-xs">
               Tanya aku soal PR, pelajaran, atau foto soalmu. Aku akan bantu kamu memahami jawabannya!
@@ -232,7 +233,7 @@ export function ChatPage() {
             animate={{ opacity: 1 }}
             className="flex items-center gap-2 text-sm text-muted-foreground"
           >
-            <span className="text-lg">🦉</span>
+            <Mascot size="sm" />
             <div className="flex gap-1">
               <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce" />
               <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce [animation-delay:0.15s]" />
@@ -340,7 +341,7 @@ export function ChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isListening ? 'Mendengarkan...' : 'Tanya Kawi...'}
+            placeholder={isListening ? 'Mendengarkan...' : 'Tanya Kawai...'}
             className="min-h-[40px] max-h-32 resize-none rounded-2xl bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary"
             rows={1}
           />

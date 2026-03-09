@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import type { ChatMessage } from '@/types';
+import { Mascot, MASCOT_NAME } from '@/components/mascot';
 
 interface ChatBubbleProps {
   message: ChatMessage;
@@ -27,8 +28,8 @@ export function ChatBubble({ message }: ChatBubbleProps) {
       >
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-sm">🦉</span>
-            <span className="text-xs font-semibold text-primary">Kawi</span>
+            <Mascot size="xs" />
+            <span className="text-xs font-semibold text-primary">{MASCOT_NAME}</span>
           </div>
         )}
 
