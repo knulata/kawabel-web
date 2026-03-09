@@ -103,7 +103,7 @@ export function LoginScreen() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="mt-2 text-white/80 text-base italic tracking-widest font-light"
+          className="mt-2 text-white/80 text-base tracking-widest font-light"
         >
           kawan belajar
         </motion.p>
