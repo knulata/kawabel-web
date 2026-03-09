@@ -156,11 +156,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
 
       {/* Main content */}
-      <main className="flex-1 max-w-5xl mx-auto w-full">{children}</main>
+      <main className="flex-1 max-w-5xl mx-auto w-full pb-20 sm:pb-0">{children}</main>
 
       {/* Bottom navigation (mobile) */}
-      <nav className="sticky bottom-0 z-40 glass border-t border-border/50 sm:hidden">
-        <div className="flex justify-around py-1">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 glass border-t border-border/50 sm:hidden">
+        <div className="flex justify-around py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (

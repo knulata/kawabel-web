@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { FREE_LIMITS, PREMIUM_LIMITS, TRIAL_DAYS } from '@/lib/constants';
+import { FREE_LIMITS, PREMIUM_LIMITS, TRIAL_DAYS, VOUCHER_CODES } from '@/lib/constants';
 
 type Plan = 'trial' | 'free' | 'premium';
 type Feature = keyof typeof FREE_LIMITS;
@@ -30,6 +30,7 @@ interface SubscriptionState {
   premiumUntil: string | null;
   paymentPending: boolean;
   dailyUsage: DailyUsage;
+  redeemedVouchers: string[];
 
   // Computed helpers
   trialDaysLeft: () => number;
@@ -41,6 +42,7 @@ interface SubscriptionState {
   startTrial: () => void;
   setPremium: (until: string) => void;
   setPaymentPending: (pending: boolean) => void;
+  redeemVoucher: (code: string) => { success: boolean; message: string };
 }
 
 export const useSubscription = create<SubscriptionState>()(
@@ -51,6 +53,7 @@ export const useSubscription = create<SubscriptionState>()(
       premiumUntil: null,
       paymentPending: false,
       dailyUsage: { chats: 0, photos: 0, quizzes: 0, dictations: 0, date: todayStr() },
+      redeemedVouchers: [],
 
       trialDaysLeft: () => {
         const state = get();
@@ -116,6 +119,35 @@ export const useSubscription = create<SubscriptionState>()(
 
       setPaymentPending: (pending: boolean) => {
         set({ paymentPending: pending });
+      },
+
+      redeemVoucher: (code: string) => {
+        const state = get();
+        const normalized = code.trim().toUpperCase();
+        const voucher = VOUCHER_CODES[normalized];
+
+        if (!voucher) {
+          return { success: false, message: 'Kode voucher tidak valid' };
+        }
+        if (state.redeemedVouchers.includes(normalized)) {
+          return { success: false, message: 'Voucher ini sudah pernah dipakai' };
+        }
+
+        // Calculate premium end date
+        const start = state.premiumUntil && state.premiumUntil > todayStr()
+          ? new Date(state.premiumUntil)
+          : new Date();
+        start.setMonth(start.getMonth() + voucher.months);
+        const until = start.toISOString().slice(0, 10);
+
+        set({
+          plan: 'premium',
+          premiumUntil: until,
+          paymentPending: false,
+          redeemedVouchers: [...state.redeemedVouchers, normalized],
+        });
+
+        return { success: true, message: `${voucher.label} berhasil diaktifkan! Premium sampai ${until}` };
       },
     }),
     {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Mascot } from '@/components/mascot';
 import { Card, CardContent } from '@/components/ui/card';
@@ -25,6 +25,7 @@ import {
   Sparkles,
   Handshake,
   Zap,
+  Ticket,
 } from 'lucide-react';
 
 const container = {
@@ -123,6 +124,104 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat('id-ID').format(price);
+}
+
+function VoucherRedeem() {
+  const [open, setOpen] = useState(false);
+  const [code, setCode] = useState('');
+  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const { redeemVoucher } = useSubscription();
+
+  const handleRedeem = () => {
+    if (!code.trim()) return;
+    setLoading(true);
+    // Small delay for UX
+    setTimeout(() => {
+      const res = redeemVoucher(code);
+      setResult(res);
+      setLoading(false);
+      if (res.success) setCode('');
+    }, 500);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.32 }}
+    >
+      <Card className="shadow-sm border-amber-200/50 bg-gradient-to-r from-amber-50 to-yellow-50">
+        <CardContent className="p-4">
+          <button
+            onClick={() => { setOpen(!open); setResult(null); }}
+            className="w-full flex items-center gap-3"
+          >
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <Ticket size={20} className="text-amber-600" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold text-amber-900">Punya voucher?</p>
+              <p className="text-xs text-amber-700">Masukkan kode untuk aktivasi Premium gratis</p>
+            </div>
+            <motion.div
+              animate={{ rotate: open ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="shrink-0"
+            >
+              <ChevronDown size={16} className="text-amber-400" />
+            </motion.div>
+          </button>
+
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4 space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={code}
+                      onChange={(e) => { setCode(e.target.value.toUpperCase()); setResult(null); }}
+                      placeholder="KAWABEL-XXXX-XX"
+                      className="flex-1 h-11 px-3 rounded-xl border border-amber-200 bg-white text-sm font-mono uppercase placeholder:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    />
+                    <Button
+                      onClick={handleRedeem}
+                      disabled={!code.trim() || loading}
+                      className="h-11 px-5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold"
+                    >
+                      {loading ? '...' : 'Pakai'}
+                    </Button>
+                  </div>
+
+                  {result && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex items-start gap-2 text-sm p-3 rounded-xl ${
+                        result.success
+                          ? 'bg-green-50 text-green-700 border border-green-200'
+                          : 'bg-red-50 text-red-700 border border-red-200'
+                      }`}
+                    >
+                      {result.success ? <Check size={16} className="shrink-0 mt-0.5" /> : <X size={16} className="shrink-0 mt-0.5" />}
+                      <span>{result.message}</span>
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
 }
 
 export function PricingPage() {
@@ -300,9 +399,12 @@ export function PricingPage() {
         className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100"
       >
         <p className="text-sm text-green-800 font-medium text-center">
-          Lebih hemat dari les privat (Rp 200rb/pertemuan). Kawabel siap bantu 24/7 kapan saja.
+          Lebih hemat dari les privat (Rp&nbsp;200rb/pertemuan). Kawabel siap bantu 24/7 kapan saja.
         </p>
       </motion.div>
+
+      {/* Voucher Redemption */}
+      <VoucherRedeem />
 
       {/* Partner CTA */}
       <motion.div

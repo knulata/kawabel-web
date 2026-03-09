@@ -4,21 +4,16 @@ import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useStudent } from '@/store/use-student';
-import { useGamification, getLevelFromXP } from '@/store/use-gamification';
+import { useGamification, getLevelFromXP, getXPForNextLevel } from '@/store/use-gamification';
 import { ACHIEVEMENTS, ACHIEVEMENT_MAP } from '@/lib/achievements';
 import { playTap } from '@/lib/sounds';
 import { hapticLight } from '@/lib/haptics';
 import { Mascot, MASCOT_NAME } from '@/components/mascot';
-import { XPBar } from '@/components/home/xp-bar';
-import { StreakBadge } from '@/components/home/streak-badge';
-import { DailyGoal } from '@/components/home/daily-goal';
 import { ChestCard } from '@/components/home/chest-card';
-import { HeartsDisplay } from '@/components/home/hearts-display';
-import { FriendsSection } from '@/components/home/friends-section';
 import { AchievementToast } from '@/components/home/achievement-toast';
 import { TrialBanner } from '@/components/pricing/trial-banner';
 import { Card, CardContent } from '@/components/ui/card';
-import { Zap, ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 const container = {
   hidden: {},
@@ -30,7 +25,6 @@ const item = {
   show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 260, damping: 20 } },
 };
 
-/* ── Main features with clearer descriptions ──────────── */
 const MAIN_FEATURES = [
   {
     id: 'chat',
@@ -43,7 +37,7 @@ const MAIN_FEATURES = [
   {
     id: 'photo',
     title: 'Foto Soal',
-    desc: 'Foto soal dari buku, bantu jawab',
+    desc: 'Untuk dapat penjelasan',
     emoji: '📸',
     href: '/chat?photo=1',
     gradient: 'from-sky-400 to-blue-600',
@@ -68,9 +62,12 @@ const MAIN_FEATURES = [
 
 export function HomePage() {
   const { student } = useStudent();
-  const { xp, gems, streak, dailyXP, dailyGoalXP, achievements, maxCombo } =
+  const { xp, streak, dailyXP, dailyGoalXP, achievements, chestsAvailable } =
     useGamification();
   const level = getLevelFromXP(xp);
+  const { current, needed } = getXPForNextLevel(xp);
+  const xpPct = Math.min((current / needed) * 100, 100);
+  const dailyPct = Math.min((dailyXP / dailyGoalXP) * 100, 100);
   const [showAchievement, setShowAchievement] = useState<string | null>(null);
 
   const firstName = student?.name?.split(' ')[0] || null;
@@ -92,12 +89,9 @@ export function HomePage() {
         onDismiss={handleAchievementDismiss}
       />
 
-      {/* ══════════════════════════════════════════════════════
-          NEW USER: Clear value prop + features up front
-          ══════════════════════════════════════════════════════ */}
       {isNewUser ? (
+        /* ══════ NEW USER ══════ */
         <>
-          {/* Hero — what is Kawabel? */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -149,10 +143,8 @@ export function HomePage() {
           </motion.div>
 
           <div className="px-4 space-y-5 mt-2">
-            {/* Trial banner */}
             <TrialBanner />
 
-            {/* Feature cards — big and clear */}
             <motion.div
               variants={container}
               initial="hidden"
@@ -189,7 +181,7 @@ export function HomePage() {
               ))}
             </motion.div>
 
-            {/* How it works — quick 3-step */}
+            {/* How it works */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -218,7 +210,7 @@ export function HomePage() {
               </Card>
             </motion.div>
 
-            {/* Bottom CTA */}
+            {/* Upgrade CTA */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -242,216 +234,192 @@ export function HomePage() {
           </div>
         </>
       ) : (
-        /* ══════════════════════════════════════════════════════
-           RETURNING USER: Stats dashboard + features
-           ══════════════════════════════════════════════════════ */
-        <>
-          {/* Compact hero */}
+        /* ══════ RETURNING USER — Clean Duolingo-style ══════ */
+        <div className="px-4 space-y-5 pt-4">
+          {/* Greeting */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="kawabel-gradient px-5 pt-5 pb-6 relative overflow-hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
           >
-            <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/5" />
+            <h2 className="text-2xl font-bold text-foreground">
+              Halo, {firstName || 'Kawan'}! 👋
+            </h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Mau belajar apa hari ini?
+            </p>
+          </motion.div>
 
-            <div className="relative flex items-center justify-between mb-3">
-              <div>
-                <p className="text-white/50 text-xs font-medium uppercase tracking-widest">
-                  {getGreeting()}
-                </p>
-                <h2 className="text-2xl font-bold text-white mt-0.5">
-                  {firstName || 'Halo'}! 👋
-                </h2>
-              </div>
-              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg">
-                <Mascot size="lg" animate />
-              </div>
+          {/* Stats strip — compact, Duolingo-style */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="flex items-center gap-2"
+          >
+            {/* Streak */}
+            <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold ${
+              streak > 0
+                ? 'bg-orange-50 border border-orange-200 text-orange-600'
+                : 'bg-muted border border-border text-muted-foreground'
+            }`}>
+              <span>{streak > 0 ? '🔥' : '❄️'}</span>
+              <span>{streak} hari</span>
             </div>
 
-            {/* Compact stats */}
-            <div className="flex items-center gap-3 pt-3 border-t border-white/10">
-              <StatChip icon={
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 flex items-center justify-center text-[9px] font-black text-white">
-                  {level}
-                </div>
-              } value={`${xp} XP`} />
+            {/* Daily progress */}
+            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-green-50 border border-green-200 text-sm font-bold text-green-600">
+              <span>⚡</span>
+              <span>{dailyXP}/{dailyGoalXP}</span>
+              {dailyXP >= dailyGoalXP && <span className="text-xs">✅</span>}
+            </div>
 
-              {streak > 0 && (
-                <StatChip icon={<span className="text-xs">🔥</span>} value={`${streak} hari`} />
-              )}
-
-              <div className="ml-auto">
-                <HeartsDisplay />
+            {/* Level + XP */}
+            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 border border-purple-200 text-sm font-bold text-purple-600 ml-auto">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-white text-[9px] font-black">
+                {level}
               </div>
+              <span>{xp} XP</span>
             </div>
           </motion.div>
 
-          <div className="px-4 space-y-4 -mt-3">
-            {/* XP bar card */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <Card className="shadow-md border-0">
-                <CardContent className="p-4">
-                  <XPBar />
-                </CardContent>
-              </Card>
-            </motion.div>
+          {/* XP progress bar — slim, under stats */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="-mt-2"
+          >
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <motion.div
+                className="h-full rounded-full bg-gradient-to-r from-green-400 via-emerald-400 to-yellow-400"
+                initial={false}
+                animate={{ width: `${xpPct}%` }}
+                transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+              />
+            </div>
+            <div className="flex justify-between mt-0.5">
+              <span className="text-[10px] text-muted-foreground">{current}/{needed} XP</span>
+              <span className="text-[10px] text-muted-foreground">Level {level + 1}</span>
+            </div>
+          </motion.div>
 
-            <TrialBanner />
+          <TrialBanner />
 
-            {/* Daily goal + streak */}
+          {/* Chest */}
+          {chestsAvailable > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className="grid grid-cols-2 gap-3"
-            >
-              <Card className="shadow-sm border-border/40">
-                <CardContent className="p-4">
-                  <DailyGoal />
-                </CardContent>
-              </Card>
-              <Card className="shadow-sm border-border/40">
-                <CardContent className="p-4 flex flex-col justify-center gap-3">
-                  <StreakBadge />
-                  {maxCombo >= 2 && (
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Zap size={12} className="text-amber-500" />
-                      Kombo terbaik: <span className="font-bold text-foreground">{maxCombo}x</span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Chest */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
             >
               <ChestCard />
             </motion.div>
+          )}
 
-            {/* Quick actions — horizontal scroll */}
-            <div>
-              <h3 className="text-base font-bold text-foreground mb-3">Lanjut Belajar</h3>
-              <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
-                {MAIN_FEATURES.map((feature) => (
-                  <Link
-                    key={feature.id}
-                    href={feature.href}
-                    onClick={handleFeatureTap}
-                    className="shrink-0"
-                  >
-                    <Card className="card-hover shadow-sm border-border/40 w-32">
-                      <CardContent className="p-3 text-center">
-                        <div
-                          className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mx-auto mb-2 shadow-md`}
-                        >
-                          <span className="text-xl">{feature.emoji}</span>
-                        </div>
-                        <p className="text-xs font-semibold text-foreground leading-tight">
+          {/* Feature cards — main content */}
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="space-y-3"
+          >
+            <h3 className="text-base font-bold text-foreground">Lanjut Belajar</h3>
+
+            {MAIN_FEATURES.map((feature) => (
+              <motion.div key={feature.id} variants={item}>
+                <Link href={feature.href} onClick={handleFeatureTap}>
+                  <Card className="card-hover shadow-sm border-border/40 group">
+                    <CardContent className="p-4 flex items-center gap-4">
+                      <div
+                        className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 transition-transform`}
+                      >
+                        <span className="text-2xl">{feature.emoji}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-base text-foreground">
                           {feature.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-0.5">
+                          {feature.desc}
                         </p>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Achievements */}
-            {achievements.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-base font-bold text-foreground flex items-center gap-1.5">
-                    <Sparkles size={14} className="text-amber-500" />
-                    Pencapaian
-                  </h3>
-                  <span className="text-[11px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                    {achievements.length}/{ACHIEVEMENTS.length}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {achievements.map((id) => {
-                    const ach = ACHIEVEMENT_MAP[id];
-                    if (!ach) return null;
-                    return (
-                      <div
-                        key={id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200/70 text-sm shadow-sm"
-                        title={ach.description}
-                      >
-                        <span>{ach.icon}</span>
-                        <span className="text-xs font-medium text-amber-800">{ach.name}</span>
                       </div>
-                    );
-                  })}
-                  {ACHIEVEMENTS.filter((a) => !achievements.includes(a.id))
-                    .slice(0, 2)
-                    .map((ach) => (
-                      <div
-                        key={ach.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50 text-sm opacity-40"
-                      >
-                        <span>🔒</span>
-                        <span className="text-xs font-medium text-muted-foreground">???</span>
-                      </div>
-                    ))}
-                </div>
+                      <ArrowRight size={16} className="text-muted-foreground/50 shrink-0 group-hover:text-primary transition-colors" />
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.div>
-            )}
+            ))}
+          </motion.div>
 
-            {/* Friends */}
+          {/* Achievements — compact */}
+          {achievements.length > 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.35 }}
+              transition={{ delay: 0.3 }}
             >
-              <FriendsSection />
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-bold text-foreground flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-amber-500" />
+                  Pencapaian
+                </h3>
+                <span className="text-[11px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                  {achievements.length}/{ACHIEVEMENTS.length}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {achievements.map((id) => {
+                  const ach = ACHIEVEMENT_MAP[id];
+                  if (!ach) return null;
+                  return (
+                    <div
+                      key={id}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200/70 text-sm shadow-sm"
+                      title={ach.description}
+                    >
+                      <span>{ach.icon}</span>
+                      <span className="text-xs font-medium text-amber-800">{ach.name}</span>
+                    </div>
+                  );
+                })}
+                {ACHIEVEMENTS.filter((a) => !achievements.includes(a.id))
+                  .slice(0, 2)
+                  .map((ach) => (
+                    <div
+                      key={ach.id}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50 text-sm opacity-40"
+                    >
+                      <span>🔒</span>
+                      <span className="text-xs font-medium text-muted-foreground">???</span>
+                    </div>
+                  ))}
+              </div>
             </motion.div>
+          )}
 
-            {/* Upgrade CTA */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              <Link href="/pricing">
-                <Card className="shadow-sm border-primary/20 bg-gradient-to-r from-green-50 to-emerald-50 card-hover">
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <Sparkles size={20} className="text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-base font-semibold text-foreground">Belajar tanpa batas</p>
-                      <p className="text-sm text-muted-foreground">Upgrade Premium — gratis 7 hari</p>
-                    </div>
-                    <ArrowRight size={16} className="text-primary" />
-                  </CardContent>
-                </Card>
-              </Link>
-            </motion.div>
-          </div>
-        </>
+          {/* Upgrade CTA */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.35 }}
+          >
+            <Link href="/pricing">
+              <Card className="shadow-sm border-primary/20 bg-gradient-to-r from-green-50 to-emerald-50 card-hover">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Sparkles size={20} className="text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-base font-semibold text-foreground">Belajar tanpa batas</p>
+                    <p className="text-sm text-muted-foreground">Upgrade Premium — gratis 7 hari</p>
+                  </div>
+                  <ArrowRight size={16} className="text-primary" />
+                </CardContent>
+              </Card>
+            </Link>
+          </motion.div>
+        </div>
       )}
-    </div>
-  );
-}
-
-function StatChip({ icon, value }: { icon: React.ReactNode; value: string }) {
-  return (
-    <div className="flex items-center gap-1.5 bg-white/10 rounded-full px-2.5 py-1">
-      {icon}
-      <span className="text-xs font-semibold text-white">{value}</span>
     </div>
   );
 }

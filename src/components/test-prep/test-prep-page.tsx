@@ -19,7 +19,7 @@ import { UpgradePrompt } from '@/components/pricing/upgrade-prompt';
 import { Mascot } from '@/components/mascot';
 import {
   BookOpen, Loader2, Check, X, ArrowRight, RotateCcw,
-  ChevronLeft, Camera, ImageIcon,
+  ChevronLeft, Camera,
 } from 'lucide-react';
 import type { TestQuestion } from '@/types';
 
@@ -46,7 +46,7 @@ export function TestPrepPage() {
   const [phase, setPhase] = useState<Phase>('select');
   const [subject, setSubject] = useState('');
   const [topic, setTopic] = useState('');
-  const [bookImage, setBookImage] = useState<string | null>(null);
+  const [bookImages, setBookImages] = useState<string[]>([]);
   const [questions, setQuestions] = useState<TestQuestion[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -59,7 +59,7 @@ export function TestPrepPage() {
     hapticLight();
     setSubject(subj);
     setTopic('');
-    setBookImage(null);
+    setBookImages([]);
     setPhase('topic');
   };
 
@@ -87,14 +87,14 @@ export function TestPrepPage() {
     if (!file) return;
     incrementUsage('photos');
     const reader = new FileReader();
-    reader.onload = () => setBookImage(reader.result as string);
+    reader.onload = () => setBookImages((prev) => [...prev, reader.result as string]);
     reader.readAsDataURL(file);
     e.target.value = '';
   };
 
   const generateQuizFromPhoto = useCallback(
     async () => {
-      if (!bookImage || !canUse('quizzes')) {
+      if (bookImages.length === 0 || !canUse('quizzes')) {
         if (!canUse('quizzes')) setShowUpgrade(true);
         return;
       }
@@ -105,6 +105,10 @@ export function TestPrepPage() {
       breakCombo();
 
       try {
+        const imageEntries = bookImages.map((img) => ({
+          type: 'image_url' as const,
+          image_url: { url: img },
+        }));
         const result = await sendChat(
           [
             {
@@ -112,15 +116,15 @@ export function TestPrepPage() {
               content: [
                 {
                   type: 'text' as const,
-                  text: `Look at this textbook page for subject "${subject}". Read and understand the content, then generate 5 multiple choice questions in Indonesian that test the student's understanding of this material. Questions should be suitable for a ${student?.grade || 'SD'} student.
+                  text: `Look at these ${bookImages.length} textbook page(s) for subject "${subject}". Read and understand the content, then generate 5 multiple choice questions in Indonesian that test the student's understanding of this material. Questions should be suitable for a ${student?.grade || 'SD'} student.
 Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]`,
                 },
-                { type: 'image_url' as const, image_url: { url: bookImage } },
+                ...imageEntries,
               ],
             },
           ] as never[],
           student?.id ?? 0,
-          'full', // vision model for reading textbook
+          'full',
         );
         const parsed = JSON.parse(
           result.reply.replace(/```json?\n?/g, '').replace(/```/g, '').trim()
@@ -131,15 +135,8 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
         setPhase('topic');
       }
     },
-    [student, subject, bookImage, breakCombo, canUse, incrementUsage]
+    [student, subject, bookImages, breakCombo, canUse, incrementUsage]
   );
-
-  // Auto-generate when photo is selected
-  useEffect(() => {
-    if (bookImage && phase === 'topic') {
-      generateQuizFromPhoto();
-    }
-  }, [bookImage, phase, generateQuizFromPhoto]);
 
   const generateQuizFromTopic = useCallback(
     async (subj: string, topicText: string) => {
@@ -326,7 +323,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             className="space-y-4"
           >
             <button
-              onClick={() => { setPhase('select'); setBookImage(null); playTap(); }}
+              onClick={() => { setPhase('select'); setBookImages([]); playTap(); }}
               className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <ChevronLeft size={16} />
@@ -348,34 +345,70 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                   </div>
                 </div>
 
-                {/* Image preview */}
-                {bookImage && (
-                  <div className="mb-4 relative">
-                    <img
-                      src={bookImage}
-                      alt="Halaman buku"
-                      className="w-full rounded-xl border border-border max-h-48 object-cover"
-                    />
-                    <button
-                      onClick={() => setBookImage(null)}
-                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center"
-                    >
-                      <X size={14} />
-                    </button>
+                {/* Thumbnail grid of captured pages */}
+                {bookImages.length > 0 && (
+                  <div className="mb-4">
+                    <div className="grid grid-cols-3 gap-2">
+                      {bookImages.map((img, i) => (
+                        <div key={i} className="relative aspect-[3/4] rounded-lg overflow-hidden border border-border">
+                          <img
+                            src={img}
+                            alt={`Halaman ${i + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            onClick={() => setBookImages((prev) => prev.filter((_, j) => j !== i))}
+                            className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center"
+                          >
+                            <X size={12} />
+                          </button>
+                          <span className="absolute bottom-1 left-1 text-[10px] font-bold bg-black/50 text-white px-1.5 py-0.5 rounded">
+                            {i + 1}
+                          </span>
+                        </div>
+                      ))}
+
+                      {/* Add more button */}
+                      <button
+                        onClick={handleCameraClick}
+                        className="aspect-[3/4] rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                        disabled={hearts === 0}
+                      >
+                        <Camera size={20} />
+                        <span className="text-[10px] mt-1 font-medium">Tambah</span>
+                      </button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      {bookImages.length} halaman difoto — tambah lagi atau buat soal
+                    </p>
                   </div>
                 )}
 
-                <Button
-                  onClick={handleCameraClick}
-                  className="w-full rounded-xl h-12 text-base font-semibold gap-2 kawabel-gradient text-white"
-                  disabled={hearts === 0}
-                >
-                  <Camera size={18} />
-                  Foto Buku Pelajaran
-                </Button>
-                <p className="text-center text-xs text-muted-foreground mt-2">
-                  Bisa juga pilih foto dari galeri
-                </p>
+                {/* Generate quiz button when photos exist */}
+                {bookImages.length > 0 ? (
+                  <Button
+                    onClick={generateQuizFromPhoto}
+                    className="w-full rounded-xl h-12 text-base font-semibold gap-2 kawabel-gradient text-white"
+                    disabled={hearts === 0}
+                  >
+                    <ArrowRight size={18} />
+                    Buat Soal dari {bookImages.length} Halaman
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      onClick={handleCameraClick}
+                      className="w-full rounded-xl h-12 text-base font-semibold gap-2 kawabel-gradient text-white"
+                      disabled={hearts === 0}
+                    >
+                      <Camera size={18} />
+                      Foto Halaman Buku
+                    </Button>
+                    <p className="text-center text-xs text-muted-foreground mt-2">
+                      Foto beberapa halaman, lalu buat soal
+                    </p>
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -444,9 +477,9 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             <Loader2 className="animate-spin text-primary" size={28} />
             <div className="text-center">
               <p className="font-semibold text-base">
-                {bookImage ? 'Membaca buku & menyiapkan soal...' : `Menyiapkan soal ${subject}...`}
+                {bookImages.length > 0 ? `Membaca ${bookImages.length} halaman & menyiapkan soal...` : `Menyiapkan soal ${subject}...`}
               </p>
-              {topic && !bookImage && (
+              {topic && bookImages.length === 0 && (
                 <p className="text-sm text-muted-foreground mt-1">Topik: {topic}</p>
               )}
             </div>
@@ -646,7 +679,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 className="flex-1 rounded-xl h-12"
                 onClick={() => {
                   playTap();
-                  setBookImage(null);
+                  setBookImages([]);
                   setPhase('select');
                 }}
               >
@@ -657,7 +690,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 className="flex-1 rounded-xl h-12"
                 onClick={() => {
                   playTap();
-                  if (bookImage) {
+                  if (bookImages.length > 0) {
                     generateQuizFromPhoto();
                   } else {
                     generateQuizFromTopic(subject, topic);

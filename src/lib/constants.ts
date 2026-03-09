@@ -100,3 +100,27 @@ export const TRIAL_DAYS = 7;
 export const BCA_ACCOUNT = '3722808999';
 export const BCA_NAME = 'Indonesia Technologies V';
 export const WHATSAPP_ADMIN = '628131102445';
+
+// Free 1-month voucher codes for parents
+export const VOUCHER_CODES: Record<string, { months: number; label: string }> = {
+  'KAWABEL-GRATIS-01': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-GRATIS-02': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-GRATIS-03': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-GRATIS-04': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-GRATIS-05': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-GRATIS-06': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-GRATIS-07': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-GRATIS-08': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-GRATIS-09': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-GRATIS-10': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-COBA-01': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-COBA-02': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-COBA-03': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-COBA-04': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-COBA-05': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-PARENT-01': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-PARENT-02': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-PARENT-03': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-PARENT-04': { months: 1, label: '1 bulan gratis' },
+  'KAWABEL-PARENT-05': { months: 1, label: '1 bulan gratis' },
+};
