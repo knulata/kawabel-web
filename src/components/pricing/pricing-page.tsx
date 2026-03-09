@@ -68,7 +68,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Kenapa bulan pertama lebih murah?',
-    a: 'Kami ingin kamu merasakan manfaat Kawabel dulu. Bulan pertama hanya Rp 49.000 supaya kamu bisa coba tanpa risiko. Setelah itu Rp 99.000/bulan.',
+    a: 'Kami ingin kamu merasakan manfaat Kawabel dulu. Bulan pertama hanya Rp 99.000 supaya kamu bisa coba tanpa risiko. Setelah itu Rp 199.000/bulan.',
   },
   {
     q: 'Apa yang terjadi setelah masa percobaan?',
@@ -218,7 +218,7 @@ export function PricingPage() {
                 className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-bold shadow-md flex items-center gap-1"
               >
                 <Zap size={12} />
-                Bulan pertama cuma Rp 49rb!
+                Bulan pertama cuma Rp 99rb!
               </motion.div>
             </div>
 

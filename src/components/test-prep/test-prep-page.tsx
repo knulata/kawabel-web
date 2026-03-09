@@ -56,7 +56,8 @@ export function TestPrepPage() {
 Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]`,
             },
           ],
-          student.id
+          student.id,
+          'mini', // text-only, use cheap model
         );
         const parsed = JSON.parse(
           result.reply.replace(/```json?\n?/g, '').replace(/```/g, '').trim()

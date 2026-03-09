@@ -23,10 +23,15 @@ export async function loginWithGoogle(idToken: string) {
 }
 
 // Chat
-export async function sendChat(messages: import('@/types').ChatMessage[], studentId: number) {
+// model: 'mini' for text-only (cheaper), 'full' for vision/complex tasks
+export async function sendChat(
+  messages: import('@/types').ChatMessage[],
+  studentId: number,
+  model: 'mini' | 'full' = 'mini',
+) {
   return fetcher<{ reply: string }>('/api/chat', {
     method: 'POST',
-    body: JSON.stringify({ messages, student_id: studentId }),
+    body: JSON.stringify({ messages, student_id: studentId, model }),
   });
 }
 

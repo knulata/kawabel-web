@@ -87,8 +87,15 @@ export const FREE_LIMITS = {
   dictations: 3,
 } as const;
 
-export const SUBSCRIPTION_PRICE = 99_000;
-export const FIRST_MONTH_PRICE = 49_000;
+export const PREMIUM_LIMITS = {
+  chats: 100,
+  photos: 30,
+  quizzes: 20,
+  dictations: 30,
+} as const;
+
+export const SUBSCRIPTION_PRICE = 199_000;
+export const FIRST_MONTH_PRICE = 99_000;
 export const TRIAL_DAYS = 7;
 export const BCA_ACCOUNT = '3722808999';
 export const BCA_NAME = 'Indonesia Technologies V';

@@ -139,7 +139,7 @@ export function UpgradePrompt({ open, feature, onDismiss }: UpgradePromptProps) 
                   className="text-xs text-muted-foreground"
                 >
 
-                  Gratis 7 hari + bulan pertama cuma Rp 49rb!
+                  Gratis 7 hari + bulan pertama cuma Rp 99rb!
                 </motion.p>
               </div>
             </div>

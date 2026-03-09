@@ -120,6 +120,7 @@ Include pinyin with tone marks and Indonesian meaning for each word. Extract eve
           },
         ] as never[],
         student.id,
+        'full', // vision model for image OCR
       );
 
       const parsed = JSON.parse(
@@ -223,6 +224,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
           },
         ] as never[],
         student.id,
+        'full', // vision model for handwriting OCR
       );
 
       const parsed = JSON.parse(

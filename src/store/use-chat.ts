@@ -50,7 +50,9 @@ export const useChat = create<ChatState>((set, get) => ({
         return { role: m.role, content: m.content };
       });
 
-      const result = await sendChat(history as ChatMessage[], studentId);
+      // Use full model only when images are in the conversation
+      const hasImages = get().messages.some((m) => m.image);
+      const result = await sendChat(history as ChatMessage[], studentId, hasImages ? 'full' : 'mini');
 
       const assistantMsg: ChatMessage = {
         role: 'assistant',

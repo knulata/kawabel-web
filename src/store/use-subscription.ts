@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { FREE_LIMITS, TRIAL_DAYS } from '@/lib/constants';
+import { FREE_LIMITS, PREMIUM_LIMITS, TRIAL_DAYS } from '@/lib/constants';
 
 type Plan = 'trial' | 'free' | 'premium';
 type Feature = keyof typeof FREE_LIMITS;
@@ -75,13 +75,16 @@ export const useSubscription = create<SubscriptionState>()(
 
       canUse: (feature: Feature) => {
         const state = get();
-        // Premium users have unlimited access
-        if (state.isPremium()) return true;
-
-        // Free tier — check daily limits
         const usage = state.dailyUsage;
         // Reset if new day
         if (usage.date !== todayStr()) return true; // will be reset on increment
+
+        // Premium/trial — soft caps (fair use)
+        if (state.isPremium()) {
+          return usage[feature] < PREMIUM_LIMITS[feature];
+        }
+
+        // Free tier — tight daily limits
         return usage[feature] < FREE_LIMITS[feature];
       },
 

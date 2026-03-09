@@ -37,7 +37,7 @@ const BENEFITS = [
   {
     icon: <Users size={22} />,
     title: 'Harga Spesial per Siswa',
-    desc: 'Mulai dari Rp 29.000/siswa/bulan untuk paket 20+ siswa. Semakin banyak siswa, semakin hemat.',
+    desc: 'Mulai dari Rp 59.000/siswa/bulan untuk paket 30+ siswa. Semakin banyak siswa, semakin hemat.',
     gradient: 'from-blue-400 to-blue-600',
   },
   {
@@ -73,9 +73,9 @@ const BENEFITS = [
 ];
 
 const PRICING_TIERS = [
-  { students: '1-10 siswa', price: 'Rp 49.000', per: '/siswa/bulan' },
-  { students: '11-30 siswa', price: 'Rp 39.000', per: '/siswa/bulan', popular: true },
-  { students: '31-100 siswa', price: 'Rp 29.000', per: '/siswa/bulan' },
+  { students: '1-10 siswa', price: 'Rp 99.000', per: '/siswa/bulan' },
+  { students: '11-30 siswa', price: 'Rp 79.000', per: '/siswa/bulan', popular: true },
+  { students: '31-100 siswa', price: 'Rp 59.000', per: '/siswa/bulan' },
   { students: '100+ siswa', price: 'Hubungi kami', per: '' },
 ];
 
