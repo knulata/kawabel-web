@@ -53,7 +53,7 @@ const MAIN_FEATURES = [
   {
     id: 'test',
     title: 'Latihan Ujian',
-    desc: 'Foto buku atau pilih topik, langsung kuis',
+    desc: 'Foto buku atau pilih topik, langsung buat kuis',
     emoji: '📝',
     href: '/test-prep',
     gradient: 'from-violet-400 to-purple-600',
