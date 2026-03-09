@@ -453,12 +453,15 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
             exit={{ opacity: 0 }}
           >
             <Card className="overflow-hidden">
-              <CardContent className="p-6">
-                <div className="text-center mb-6">
-                  <Mascot size="lg" className="mx-auto mb-3" />
-                  <h3 className="font-bold text-lg">Langkah 1: Foto Daftar Kata</h3>
-                  <p className="text-base text-muted-foreground mt-1">
+              <CardContent className="p-5">
+                <div className="text-center mb-4">
+                  <Mascot size="lg" className="mx-auto mb-2" />
+                  <h3 className="font-bold text-lg">Foto Daftar Kata</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
                     Foto halaman buku yang berisi kata-kata yang ingin di diktekan
+                  </p>
+                  <p className="text-xs text-muted-foreground/70 mt-1">
+                    Mendukung: Mandarin, Arab, Inggris, Indonesia, dan bahasa lainnya
                   </p>
                 </div>
 
