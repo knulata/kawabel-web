@@ -75,14 +75,14 @@ export function LoginScreen() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative z-10 flex flex-col items-center px-6"
+        className="relative z-10 flex flex-col items-center px-6 -mt-24"
       >
         {/* Owl mascot */}
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-          className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg"
+          className="w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-xl"
         >
           <Mascot size="xl" />
         </motion.div>
@@ -92,28 +92,30 @@ export function LoginScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-5 text-4xl font-black text-white tracking-wider"
+          className="mt-6 text-5xl font-black text-white tracking-wider"
           style={{ fontFamily: 'var(--font-nunito)' }}
         >
           kawabel
         </motion.h1>
 
+        {/* Subtitle — italic serif feel */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="mt-1 text-white/70 text-sm tracking-wide"
+          className="mt-2 text-white/80 text-base italic tracking-widest font-light"
         >
           kawan belajar
         </motion.p>
 
+        {/* Description — clean sans */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="mt-2 text-white/60 text-sm"
+          className="mt-4 text-white/50 text-xs tracking-wide uppercase font-medium"
         >
-          Masuk untuk mulai belajar dengan Kawai
+          Masuk untuk mulai belajar dengan {MASCOT_NAME}
         </motion.p>
 
         {/* Error message */}
@@ -132,7 +134,7 @@ export function LoginScreen() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="mt-10"
+          className="mt-12"
         >
           {isSigningIn ? (
             <div className="flex items-center gap-3 text-white">
