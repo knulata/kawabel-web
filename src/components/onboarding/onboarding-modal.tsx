@@ -69,7 +69,7 @@ export function OnboardingModal() {
               Halo! Siapa namamu?
             </h2>
             <p className="text-sm text-muted-foreground text-center mb-5">
-              Aku Budi si burung hantu, teman belajarmu!
+              Aku Kawabel si burung hantu, teman belajarmu!
             </p>
 
             <input
@@ -100,7 +100,7 @@ export function OnboardingModal() {
               Kelas berapa, {name.trim().split(' ')[0]}?
             </h2>
             <p className="text-sm text-muted-foreground text-center mb-4">
-              Biar Budi bisa bantu sesuai pelajaranmu
+              Biar Kawabel bisa bantu sesuai pelajaranmu
             </p>
 
             <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
