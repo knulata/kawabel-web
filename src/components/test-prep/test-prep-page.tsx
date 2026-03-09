@@ -9,15 +9,26 @@ import { sendChat, saveProgress } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { SUBJECTS } from '@/lib/constants';
 import { playTap } from '@/lib/sounds';
 import { hapticLight } from '@/lib/haptics';
 import { ComboCounter } from '@/components/home/combo-counter';
 import { UpgradePrompt } from '@/components/pricing/upgrade-prompt';
-import { BookOpen, Loader2, Check, X, ArrowRight, RotateCcw } from 'lucide-react';
+import { BookOpen, Loader2, Check, X, ArrowRight, RotateCcw, ChevronLeft } from 'lucide-react';
 import type { TestQuestion } from '@/types';
 
-type Phase = 'select' | 'loading' | 'quiz' | 'results';
+type Phase = 'select' | 'topic' | 'loading' | 'quiz' | 'results';
+
+const TOPIC_SUGGESTIONS: Record<string, string[]> = {
+  Matematika: ['Pecahan', 'Perkalian & Pembagian', 'Bangun Ruang', 'Persamaan Linear'],
+  IPA: ['Fotosintesis', 'Sistem Tata Surya', 'Siklus Air', 'Energi & Gaya'],
+  'Bahasa Indonesia': ['Teks Narasi', 'Kata Baku & Tidak Baku', 'Kalimat Efektif', 'Puisi'],
+  'Bahasa Inggris': ['Simple Present Tense', 'Vocabulary: Animals', 'Reading Comprehension', 'Past Tense'],
+  'Bahasa Mandarin': ['Angka & Waktu', 'Perkenalan Diri', 'Keluarga', 'Makanan'],
+  IPS: ['Keragaman Budaya Indonesia', 'Peta & Globe', 'Sejarah Kemerdekaan', 'Ekonomi Sederhana'],
+  PKN: ['Pancasila', 'Hak & Kewajiban', 'Norma di Masyarakat', 'Musyawarah'],
+};
 
 export function TestPrepPage() {
   const { student } = useStudent();
@@ -27,14 +38,23 @@ export function TestPrepPage() {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [phase, setPhase] = useState<Phase>('select');
   const [subject, setSubject] = useState('');
+  const [topic, setTopic] = useState('');
   const [questions, setQuestions] = useState<TestQuestion[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
 
+  const selectSubject = (subj: string) => {
+    playTap();
+    hapticLight();
+    setSubject(subj);
+    setTopic('');
+    setPhase('topic');
+  };
+
   const generateQuiz = useCallback(
-    async (subj: string) => {
+    async (subj: string, topicText: string) => {
       if (!canUse('quizzes')) {
         setShowUpgrade(true);
         return;
@@ -46,17 +66,21 @@ export function TestPrepPage() {
       setAnswers([]);
       breakCombo();
 
+      const topicPrompt = topicText
+        ? `about the topic "${topicText}"`
+        : '';
+
       try {
         const result = await sendChat(
           [
             {
               role: 'user' as const,
-              content: `Generate 5 multiple choice questions for subject "${subj}" suitable for a ${student?.grade || 'SD'} Indonesian student.
+              content: `Generate 5 multiple choice questions for subject "${subj}" ${topicPrompt} suitable for a ${student?.grade || 'SD'} Indonesian student. Questions should be in Indonesian.
 Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]`,
             },
           ],
           student?.id ?? 0,
-          'mini', // text-only, use cheap model
+          'mini',
         );
         const parsed = JSON.parse(
           result.reply.replace(/```json?\n?/g, '').replace(/```/g, '').trim()
@@ -64,7 +88,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
         setQuestions(Array.isArray(parsed) ? parsed : []);
         setPhase('quiz');
       } catch {
-        setPhase('select');
+        setPhase('topic');
       }
     },
     [student, breakCombo, canUse, incrementUsage]
@@ -78,9 +102,9 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
 
     const isCorrectAnswer = idx === questions[currentQ]?.correct;
     if (isCorrectAnswer) {
-      correctAnswer(); // plays sound, haptic, adds XP, updates combo
+      correctAnswer();
     } else {
-      wrongAnswer(); // plays sound, haptic, loses heart
+      wrongAnswer();
     }
   };
 
@@ -90,19 +114,16 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
       setSelected(null);
       setShowExplanation(false);
     } else {
-      // Quiz complete
       const totalCorrectCount = [...answers, selected].reduce(
         (acc: number, ans, i) => acc + (ans === questions[i]?.correct ? 1 : 0),
         0,
       );
 
-      // Check for perfect quiz achievement
       if (totalCorrectCount === questions.length) {
         earnAchievement('PERFECT_QUIZ');
-        addXP(20); // bonus XP for perfect score
+        addXP(20);
       }
 
-      // First lesson achievement
       earnAchievement('FIRST_LESSON');
 
       if (student) {
@@ -110,7 +131,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
           await saveProgress({
             student_id: student.id,
             subject,
-            topic: 'Latihan Ujian',
+            topic: topic || 'Latihan Ujian',
             score: totalCorrectCount,
             total: questions.length,
             type: 'test',
@@ -128,6 +149,8 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
     0,
   );
 
+  const suggestions = TOPIC_SUGGESTIONS[subject] || [];
+
   return (
     <div className="px-4 py-6 max-w-lg mx-auto">
       {/* Combo counter overlay */}
@@ -140,7 +163,11 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
       >
         <h2 className="text-2xl font-bold">📝 Latihan Ujian</h2>
         <p className="text-base text-muted-foreground">
-          Pilih mata pelajaran untuk mulai latihan
+          {phase === 'select'
+            ? 'Pilih mata pelajaran untuk mulai latihan'
+            : phase === 'topic'
+              ? `${subject} — pilih atau ketik topik`
+              : ''}
         </p>
       </motion.div>
 
@@ -149,13 +176,14 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700"
+          className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-base text-red-700"
         >
           💔 Hati habis! Tunggu regenerasi atau isi ulang dengan gems.
         </motion.div>
       )}
 
       <AnimatePresence mode="wait">
+        {/* ── Subject selection ── */}
         {phase === 'select' && (
           <motion.div
             key="select"
@@ -168,11 +196,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
               <Card
                 key={subj}
                 className="card-hover cursor-pointer"
-                onClick={() => {
-                  playTap();
-                  hapticLight();
-                  generateQuiz(subj);
-                }}
+                onClick={() => selectSubject(subj)}
               >
                 <CardContent className="p-4 flex items-center gap-3">
                   <BookOpen size={20} className="text-primary shrink-0" />
@@ -183,6 +207,73 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
           </motion.div>
         )}
 
+        {/* ── Topic selection ── */}
+        {phase === 'topic' && (
+          <motion.div
+            key="topic"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="space-y-4"
+          >
+            <button
+              onClick={() => { setPhase('select'); playTap(); }}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronLeft size={16} />
+              Ganti mata pelajaran
+            </button>
+
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <div>
+                  <label className="text-base font-semibold block mb-2">
+                    Mau latihan topik apa?
+                  </label>
+                  <Textarea
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                    placeholder={`Contoh: "${suggestions[0] || 'Bab 3 tentang...'}"` }
+                    className="min-h-[50px] max-h-24 resize-none rounded-xl text-base"
+                    rows={1}
+                  />
+                </div>
+
+                {suggestions.length > 0 && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Atau pilih topik:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {suggestions.map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => { setTopic(s); playTap(); }}
+                          className={`px-3 py-1.5 rounded-full border text-sm transition-colors ${
+                            topic === s
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'border-border text-muted-foreground hover:bg-muted'
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <Button
+                  onClick={() => generateQuiz(subject, topic)}
+                  className="w-full rounded-xl h-12 text-base font-semibold"
+                  disabled={hearts === 0}
+                >
+                  <ArrowRight size={18} className="mr-2" />
+                  {topic ? 'Mulai Latihan' : 'Latihan Acak'}
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* ── Loading ── */}
         {phase === 'loading' && (
           <motion.div
             key="loading"
@@ -192,12 +283,14 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             className="flex flex-col items-center py-16 gap-3"
           >
             <Loader2 className="animate-spin text-primary" size={32} />
-            <p className="text-sm text-muted-foreground">
-              Menyiapkan soal {subject}...
+            <p className="text-base text-muted-foreground">
+              Menyiapkan soal {subject}
+              {topic ? ` — ${topic}` : ''}...
             </p>
           </motion.div>
         )}
 
+        {/* ── Quiz ── */}
         {phase === 'quiz' && questions[currentQ] && (
           <motion.div
             key={`q-${currentQ}`}
@@ -210,7 +303,9 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
               <Badge variant="secondary">
                 Soal {currentQ + 1}/{questions.length}
               </Badge>
-              <span className="text-sm text-muted-foreground">{subject}</span>
+              <span className="text-sm text-muted-foreground">
+                {subject}{topic ? ` · ${topic}` : ''}
+              </span>
             </div>
 
             <div className="w-full bg-muted rounded-full h-1.5 mb-6">
@@ -335,6 +430,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
           </motion.div>
         )}
 
+        {/* ── Results ── */}
         {phase === 'results' && (
           <motion.div
             key="results"
@@ -397,7 +493,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 className="flex-1 rounded-xl h-12"
                 onClick={() => {
                   playTap();
-                  generateQuiz(subject);
+                  generateQuiz(subject, topic);
                 }}
               >
                 Coba Lagi

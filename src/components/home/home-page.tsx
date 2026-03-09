@@ -59,7 +59,7 @@ const MAIN_FEATURES = [
   {
     id: 'test',
     title: 'Latihan Ujian',
-    desc: 'Kuis pilihan ganda semua mapel',
+    desc: 'Kuis pilihan ganda semua mata pelajaran',
     icon: <BookOpen size={22} />,
     href: '/test-prep',
     gradient: 'from-purple-400 to-purple-600',
