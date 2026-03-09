@@ -55,8 +55,6 @@ export function ChatPage() {
   const handleSend = async () => {
     const text = input.trim();
     if (!text && !imagePreview) return;
-    if (!student) return;
-
     // Check usage limits
     if (!canUse('chats')) {
       setShowUpgrade('chats');
@@ -70,7 +68,7 @@ export function ChatPage() {
     playTap();
     hapticLight();
     incrementUsage('chats');
-    await sendMessage(text || 'Tolong bantu soal ini', student.id, img || undefined);
+    await sendMessage(text || 'Tolong bantu soal ini', student?.id ?? 0, img || undefined);
     addXP(5); // XP for asking questions
     earnAchievement('FIRST_LESSON');
 

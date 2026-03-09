@@ -35,7 +35,6 @@ export function TestPrepPage() {
 
   const generateQuiz = useCallback(
     async (subj: string) => {
-      if (!student) return;
       if (!canUse('quizzes')) {
         setShowUpgrade(true);
         return;
@@ -52,11 +51,11 @@ export function TestPrepPage() {
           [
             {
               role: 'user' as const,
-              content: `Generate 5 multiple choice questions for subject "${subj}" suitable for a ${student.grade || 'SD'} Indonesian student.
+              content: `Generate 5 multiple choice questions for subject "${subj}" suitable for a ${student?.grade || 'SD'} Indonesian student.
 Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]`,
             },
           ],
-          student.id,
+          student?.id ?? 0,
           'mini', // text-only, use cheap model
         );
         const parsed = JSON.parse(

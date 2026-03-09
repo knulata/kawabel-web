@@ -7,7 +7,9 @@ import { getProgress } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BarChart3, BookOpen, PenLine, GraduationCap } from 'lucide-react';
+import { Mascot } from '@/components/mascot';
+import { SignInButton } from '@/components/auth/sign-in-button';
+import { BarChart3, BookOpen, PenLine, GraduationCap, LogIn } from 'lucide-react';
 import type { ProgressEntry } from '@/types';
 
 export function ProgressPage() {
@@ -16,7 +18,10 @@ export function ProgressPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!student) return;
+    if (!student) {
+      setLoading(false);
+      return;
+    }
     getProgress(student.id)
       .then((data) => setEntries(data.progress || []))
       .catch(() => {})
@@ -44,17 +49,47 @@ export function ProgressPage() {
       >
         <h2 className="text-xl font-bold">📊 Progres Belajar</h2>
         <p className="text-sm text-muted-foreground">
-          Perkembangan belajar {student?.name?.split(' ')[0]}
+          {student
+            ? `Perkembangan belajar ${student.name?.split(' ')[0]}`
+            : 'Masuk untuk melihat progres belajarmu'}
         </p>
       </motion.div>
 
-      {loading ? (
+      {/* Guest prompt */}
+      {!student && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="shadow-sm">
+            <CardContent className="p-8 text-center space-y-4">
+              <Mascot size="xl" className="mx-auto" />
+              <div>
+                <h3 className="font-bold text-base">Masuk untuk melihat progres</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Dengan masuk menggunakan Google, semua hasil belajar, skor, dan pencapaianmu akan tersimpan dan bisa dilihat di sini.
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <SignInButton />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Tanpa masuk, kamu tetap bisa belajar — tapi progres tidak tersimpan ke server.
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {student && loading && (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-24 rounded-xl" />
           ))}
         </div>
-      ) : (
+      )}
+
+      {student && !loading && (
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-3 gap-3 mb-6">

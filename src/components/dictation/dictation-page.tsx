@@ -97,7 +97,7 @@ export function DictationPage() {
   };
 
   const extractWords = useCallback(async () => {
-    if (!student || !wordListImage) return;
+    if (!wordListImage) return;
 
     incrementUsage('dictations');
     setPhase('extracting');
@@ -119,7 +119,7 @@ Include pinyin with tone marks and Indonesian meaning for each word. Extract eve
             ],
           },
         ] as never[],
-        student.id,
+        student?.id ?? 0,
         'full', // vision model for image OCR
       );
 
@@ -197,7 +197,7 @@ Include pinyin with tone marks and Indonesian meaning for each word. Extract eve
   };
 
   const checkAnswers = useCallback(async () => {
-    if (!student || !answerImage) return;
+    if (!answerImage) return;
 
     setPhase('checking');
     setError(null);
@@ -223,7 +223,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
             ],
           },
         ] as never[],
-        student.id,
+        student?.id ?? 0,
         'full', // vision model for handwriting OCR
       );
 
@@ -245,17 +245,19 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
       earnAchievement('FIRST_LESSON');
 
       // Save progress
-      try {
-        await saveProgress({
-          student_id: student.id,
-          subject: 'Bahasa Mandarin',
-          topic: '听写 Dictation',
-          score: correctCount,
-          total: words.length,
-          type: 'dictation',
-        });
-      } catch {
-        // silent
+      if (student) {
+        try {
+          await saveProgress({
+            student_id: student.id,
+            subject: 'Bahasa Mandarin',
+            topic: '听写 Dictation',
+            score: correctCount,
+            total: words.length,
+            type: 'dictation',
+          });
+        } catch {
+          // silent
+        }
       }
 
       setPhase('results');

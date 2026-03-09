@@ -84,7 +84,7 @@ export function HomePage() {
               transition={{ delay: 0.05 }}
               className="text-xl font-bold"
             >
-              {student?.name?.split(' ')[0]}! 👋
+              {student?.name?.split(' ')[0] || 'Halo'}! 👋
             </motion.h2>
             <motion.p
               initial={{ opacity: 0 }}
