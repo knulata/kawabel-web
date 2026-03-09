@@ -73,7 +73,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Top bar */}
       <header className="sticky top-0 z-40 glass border-b border-border/50">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5" onClick={handleNavTap}>
+          <Link href="/" className="flex items-center gap-1.5" onClick={handleNavTap}>
             <Mascot size="lg" />
             <span
               className="text-2xl font-black kawabel-gradient-text tracking-wide"
