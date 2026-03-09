@@ -203,7 +203,7 @@ export function HomePage() {
                   <div className="p-4 space-y-3">
                     {[
                       { num: '1', text: 'Pilih fitur di atas atau langsung ketik pertanyaan' },
-                      { num: '2', text: 'Kawai jelaskan jawaban langkah demi langkah' },
+                      { num: '2', text: 'Kawabel jelaskan jawaban langkah demi langkah' },
                       { num: '3', text: 'Kumpulkan XP dan naik level sambil belajar!' },
                     ].map((step) => (
                       <div key={step.num} className="flex items-start gap-3">

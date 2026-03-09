@@ -25,7 +25,7 @@ function OwlSVG({ width, height }: { width: number; height: number }) {
       width={width}
       height={height}
       role="img"
-      aria-label="Kawai the owl"
+      aria-label="Kawabel the owl"
     >
       {/* Ear tufts */}
       <polygon points="38,42 46,54 50,40" fill="#8B6914" />
@@ -83,4 +83,4 @@ export function Mascot({ size = 'md', animate = false, className = '' }: MascotP
   );
 }
 
-export const MASCOT_NAME = 'Kawai';
+export const MASCOT_NAME = 'Kawabel';

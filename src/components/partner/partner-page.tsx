@@ -43,7 +43,7 @@ const BENEFITS = [
   {
     icon: <Clock size={22} />,
     title: 'Bantuan PR 24/7',
-    desc: 'Siswa bisa belajar kapan saja di rumah. Kawai siap bantu mengerjakan PR dan memahami pelajaran.',
+    desc: 'Siswa bisa belajar kapan saja di rumah. Kawabel siap bantu mengerjakan PR dan memahami pelajaran.',
     gradient: 'from-green-400 to-emerald-600',
   },
   {

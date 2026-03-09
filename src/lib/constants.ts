@@ -15,7 +15,7 @@ export const COLORS = {
 export const FEATURES = [
   {
     id: 'chat',
-    title: 'Tanya Kawai',
+    title: 'Tanya Kawabel',
     subtitle: 'Bantuan PR & pelajaran',
     icon: '💬',
     href: '/chat',
@@ -24,7 +24,7 @@ export const FEATURES = [
   {
     id: 'photo',
     title: 'Foto PR',
-    subtitle: 'Foto soal, Kawai bantu',
+    subtitle: 'Foto soal, Kawabel bantu',
     icon: '📷',
     href: '/chat?photo=1',
     gradient: 'from-blue-400 to-blue-600',

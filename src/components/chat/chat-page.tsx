@@ -356,7 +356,7 @@ export function ChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isListening ? 'Mendengarkan...' : 'Tanya Kawai...'}
+            placeholder={isListening ? 'Mendengarkan...' : 'Tanya Kawabel...'}
             className="min-h-[40px] max-h-32 resize-none rounded-2xl bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary"
             rows={1}
           />
