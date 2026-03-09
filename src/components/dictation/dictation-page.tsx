@@ -3,10 +3,11 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStudent } from '@/store/use-student';
-import { sendChat } from '@/lib/api';
-import { saveProgress } from '@/lib/api';
+import { useGamification } from '@/store/use-gamification';
+import { sendChat, saveProgress } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { ComboCounter } from '@/components/home/combo-counter';
 import { Volume2, RotateCcw, Check, ArrowRight, Loader2 } from 'lucide-react';
 
 interface DictationWord {
@@ -16,7 +17,8 @@ interface DictationWord {
 }
 
 export function DictationPage() {
-  const { student, addStars } = useStudent();
+  const { student } = useStudent();
+  const { correctAnswer, wrongAnswer, combo, hearts, earnAchievement } = useGamification();
   const [currentWord, setCurrentWord] = useState<DictationWord | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [showResult, setShowResult] = useState(false);
@@ -110,13 +112,23 @@ Reply ONLY with JSON: {"chinese":"字","pinyin":"zì","meaning":"character"}`,
     const correct = answer === currentWord.chinese;
     setIsCorrect(correct);
     setShowResult(true);
-    setScore((s) => ({
-      correct: s.correct + (correct ? 1 : 0),
-      total: s.total + 1,
-    }));
 
+    const newScore = {
+      correct: score.correct + (correct ? 1 : 0),
+      total: score.total + 1,
+    };
+    setScore(newScore);
+
+    // Gamification
     if (correct) {
-      addStars(2);
+      correctAnswer(); // sound, haptic, XP, combo
+    } else {
+      wrongAnswer(); // sound, haptic, lose heart
+    }
+
+    // Mandarin master achievement
+    if (newScore.correct >= 50) {
+      earnAchievement('MANDARIN_MASTER');
     }
 
     try {
@@ -142,6 +154,9 @@ Reply ONLY with JSON: {"chinese":"字","pinyin":"zì","meaning":"character"}`,
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto">
+      {/* Combo counter */}
+      <ComboCounter />
+
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -153,15 +168,30 @@ Reply ONLY with JSON: {"chinese":"字","pinyin":"zì","meaning":"character"}`,
         </p>
       </motion.div>
 
-      {/* Score */}
+      {/* Score & hearts warning */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 text-sm">
           <span className="font-semibold text-primary">
             {score.correct}/{score.total}
           </span>
           <span className="text-muted-foreground">benar</span>
+          {combo >= 2 && (
+            <span className="text-xs text-orange-500 font-bold">
+              🔥 {combo}x kombo
+            </span>
+          )}
         </div>
       </div>
+
+      {hearts === 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700"
+        >
+          💔 Hati habis! Tunggu regenerasi atau isi ulang dengan gems.
+        </motion.div>
+      )}
 
       {/* Word card */}
       <Card className="mb-4">
@@ -201,7 +231,9 @@ Reply ONLY with JSON: {"chinese":"字","pinyin":"zì","meaning":"character"}`,
                     <p className="text-sm text-muted-foreground">
                       {currentWord.pinyin}
                     </p>
-                    <div
+                    <motion.div
+                      initial={{ scale: 0.8 }}
+                      animate={{ scale: 1 }}
                       className={`mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold ${
                         isCorrect
                           ? 'bg-green-100 text-green-700'
@@ -210,12 +242,12 @@ Reply ONLY with JSON: {"chinese":"字","pinyin":"zì","meaning":"character"}`,
                     >
                       {isCorrect ? (
                         <>
-                          <Check size={14} /> Benar! +2 ⭐
+                          <Check size={14} /> Benar! +{10 + (combo >= 10 ? 5 : combo >= 5 ? 3 : combo >= 3 ? 2 : 0)} XP
                         </>
                       ) : (
-                        'Belum tepat'
+                        'Belum tepat 💔'
                       )}
-                    </div>
+                    </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -229,20 +261,17 @@ Reply ONLY with JSON: {"chinese":"字","pinyin":"zì","meaning":"character"}`,
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium">Tulis jawabanmu:</p>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearCanvas}
-                className="text-xs"
-              >
-                <RotateCcw size={14} className="mr-1" />
-                Hapus
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearCanvas}
+              className="text-xs"
+            >
+              <RotateCcw size={14} className="mr-1" />
+              Hapus
+            </Button>
           </div>
 
-          {/* Canvas */}
           <canvas
             ref={canvasRef}
             width={400}
@@ -257,7 +286,6 @@ Reply ONLY with JSON: {"chinese":"字","pinyin":"zì","meaning":"character"}`,
             onTouchEnd={stopDraw}
           />
 
-          {/* Text input alternative */}
           <div className="mt-3 flex gap-2">
             <input
               type="text"
@@ -266,6 +294,7 @@ Reply ONLY with JSON: {"chinese":"字","pinyin":"zì","meaning":"character"}`,
               placeholder="Ketik karakter di sini..."
               className="flex-1 px-3 py-2 rounded-xl bg-muted/50 border-0 text-lg text-center focus:outline-none focus:ring-2 focus:ring-primary"
               lang="zh"
+              disabled={hearts === 0}
             />
           </div>
         </CardContent>
@@ -276,7 +305,7 @@ Reply ONLY with JSON: {"chinese":"字","pinyin":"zì","meaning":"character"}`,
         {!showResult ? (
           <Button
             onClick={checkAnswer}
-            disabled={!userAnswer.trim() || !currentWord}
+            disabled={!userAnswer.trim() || !currentWord || hearts === 0}
             className="flex-1 rounded-xl h-12"
           >
             <Check size={18} className="mr-2" />

@@ -4,7 +4,10 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useChat } from '@/store/use-chat';
 import { useStudent } from '@/store/use-student';
-import { Camera, Send, ArrowDown, Trash2, Image as ImageIcon } from 'lucide-react';
+import { useGamification } from '@/store/use-gamification';
+import { playTap } from '@/lib/sounds';
+import { hapticLight } from '@/lib/haptics';
+import { Camera, Send, ArrowDown, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ChatBubble } from '@/components/chat/chat-bubble';
@@ -12,6 +15,7 @@ import { ChatBubble } from '@/components/chat/chat-bubble';
 export function ChatPage() {
   const { student } = useStudent();
   const { messages, isLoading, error, sendMessage, clearMessages } = useChat();
+  const { addXP, earnAchievement } = useGamification();
   const [input, setInput] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
@@ -45,7 +49,17 @@ export function ChatPage() {
     const img = imagePreview;
     setImagePreview(null);
 
+    playTap();
+    hapticLight();
     await sendMessage(text || 'Tolong bantu soal ini', student.id, img || undefined);
+    addXP(5); // XP for asking questions
+    earnAchievement('FIRST_LESSON');
+
+    // Time-based achievements
+    const hour = new Date().getHours();
+    if (hour < 7) earnAchievement('EARLY_BIRD');
+    if (hour >= 22) earnAchievement('NIGHT_OWL');
+
     textareaRef.current?.focus();
   };
 

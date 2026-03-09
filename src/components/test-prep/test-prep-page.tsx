@@ -3,18 +3,24 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStudent } from '@/store/use-student';
+import { useGamification } from '@/store/use-gamification';
 import { sendChat, saveProgress } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SUBJECTS } from '@/lib/constants';
+import { playTap } from '@/lib/sounds';
+import { hapticLight } from '@/lib/haptics';
+import { ComboCounter } from '@/components/home/combo-counter';
 import { BookOpen, Loader2, Check, X, ArrowRight, RotateCcw } from 'lucide-react';
 import type { TestQuestion } from '@/types';
 
 type Phase = 'select' | 'loading' | 'quiz' | 'results';
 
 export function TestPrepPage() {
-  const { student, addStars } = useStudent();
+  const { student } = useStudent();
+  const { correctAnswer, wrongAnswer, breakCombo, combo, hearts, earnAchievement, addXP } =
+    useGamification();
   const [phase, setPhase] = useState<Phase>('select');
   const [subject, setSubject] = useState('');
   const [questions, setQuestions] = useState<TestQuestion[]>([]);
@@ -30,6 +36,7 @@ export function TestPrepPage() {
       setPhase('loading');
       setCurrentQ(0);
       setAnswers([]);
+      breakCombo();
 
       try {
         const result = await sendChat(
@@ -51,7 +58,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
         setPhase('select');
       }
     },
-    [student]
+    [student, breakCombo]
   );
 
   const handleAnswer = (idx: number) => {
@@ -59,6 +66,13 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
     setSelected(idx);
     setShowExplanation(true);
     setAnswers((prev) => [...prev, idx]);
+
+    const isCorrectAnswer = idx === questions[currentQ]?.correct;
+    if (isCorrectAnswer) {
+      correctAnswer(); // plays sound, haptic, adds XP, updates combo
+    } else {
+      wrongAnswer(); // plays sound, haptic, loses heart
+    }
   };
 
   const nextQuestion = async () => {
@@ -68,24 +82,27 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
       setShowExplanation(false);
     } else {
       // Quiz complete
-      const correctCount = answers.reduce(
+      const totalCorrectCount = [...answers, selected].reduce(
         (acc: number, ans, i) => acc + (ans === questions[i]?.correct ? 1 : 0),
         0,
       );
 
-      // Include final answer
-      const finalCorrect =
-        correctCount +
-        (selected === questions[currentQ]?.correct ? 1 : 0);
+      // Check for perfect quiz achievement
+      if (totalCorrectCount === questions.length) {
+        earnAchievement('PERFECT_QUIZ');
+        addXP(20); // bonus XP for perfect score
+      }
+
+      // First lesson achievement
+      earnAchievement('FIRST_LESSON');
 
       if (student) {
-        addStars(finalCorrect);
         try {
           await saveProgress({
             student_id: student.id,
             subject,
             topic: 'Latihan Ujian',
-            score: finalCorrect,
+            score: totalCorrectCount,
             total: questions.length,
             type: 'test',
           });
@@ -104,6 +121,9 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto">
+      {/* Combo counter overlay */}
+      {phase === 'quiz' && <ComboCounter />}
+
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -114,6 +134,17 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
           Pilih mata pelajaran untuk mulai latihan
         </p>
       </motion.div>
+
+      {/* No hearts warning */}
+      {hearts === 0 && phase !== 'results' && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700"
+        >
+          💔 Hati habis! Tunggu regenerasi atau isi ulang dengan gems.
+        </motion.div>
+      )}
 
       <AnimatePresence mode="wait">
         {phase === 'select' && (
@@ -128,7 +159,11 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
               <Card
                 key={subj}
                 className="card-hover cursor-pointer"
-                onClick={() => generateQuiz(subj)}
+                onClick={() => {
+                  playTap();
+                  hapticLight();
+                  generateQuiz(subj);
+                }}
               >
                 <CardContent className="p-4 flex items-center gap-3">
                   <BookOpen size={20} className="text-primary shrink-0" />
@@ -170,11 +205,13 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             </div>
 
             <div className="w-full bg-muted rounded-full h-1.5 mb-6">
-              <div
-                className="bg-primary rounded-full h-1.5 transition-all"
-                style={{
+              <motion.div
+                className="bg-primary rounded-full h-1.5"
+                initial={false}
+                animate={{
                   width: `${((currentQ + 1) / questions.length) * 100}%`,
                 }}
+                transition={{ type: 'spring', stiffness: 100 }}
               />
             </div>
 
@@ -205,24 +242,34 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 }
 
                 return (
-                  <Button
+                  <motion.div
                     key={i}
-                    variant={variant}
-                    className={`w-full justify-start h-auto py-3 px-4 text-left text-sm ${extraClass}`}
-                    onClick={() => handleAnswer(i)}
-                    disabled={selected !== null}
+                    initial={false}
+                    animate={
+                      selected !== null && isCorrectAnswer
+                        ? { scale: [1, 1.03, 1] }
+                        : {}
+                    }
+                    transition={{ duration: 0.3 }}
                   >
-                    <span className="font-semibold mr-2">
-                      {String.fromCharCode(65 + i)}.
-                    </span>
-                    {opt}
-                    {selected !== null && isCorrectAnswer && (
-                      <Check size={16} className="ml-auto" />
-                    )}
-                    {isSelected && !isCorrectAnswer && (
-                      <X size={16} className="ml-auto" />
-                    )}
-                  </Button>
+                    <Button
+                      variant={variant}
+                      className={`w-full justify-start h-auto py-3 px-4 text-left text-sm ${extraClass}`}
+                      onClick={() => handleAnswer(i)}
+                      disabled={selected !== null || hearts === 0}
+                    >
+                      <span className="font-semibold mr-2">
+                        {String.fromCharCode(65 + i)}.
+                      </span>
+                      {opt}
+                      {selected !== null && isCorrectAnswer && (
+                        <Check size={16} className="ml-auto" />
+                      )}
+                      {isSelected && !isCorrectAnswer && (
+                        <X size={16} className="ml-auto" />
+                      )}
+                    </Button>
+                  </motion.div>
                 );
               })}
             </div>
@@ -246,6 +293,20 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* XP earned indicator */}
+            {selected !== null && selected === questions[currentQ].correct && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center mb-3"
+              >
+                <span className="text-sm font-semibold text-primary">
+                  +{10 + (combo >= 10 ? 5 : combo >= 5 ? 3 : combo >= 3 ? 2 : 0)} XP
+                  {combo >= 2 && ` (${combo}x kombo!)`}
+                </span>
+              </motion.div>
+            )}
 
             {selected !== null && (
               <Button onClick={nextQuestion} className="w-full rounded-xl h-12">
@@ -272,35 +333,63 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-8"
           >
-            <div className="text-6xl mb-4">
-              {totalCorrect >= 4 ? '🎉' : totalCorrect >= 2 ? '👍' : '💪'}
-            </div>
+            <motion.div
+              className="text-6xl mb-4"
+              initial={{ scale: 0, rotate: -20 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 200 }}
+            >
+              {totalCorrect === questions.length
+                ? '🏆'
+                : totalCorrect >= 4
+                  ? '🎉'
+                  : totalCorrect >= 2
+                    ? '👍'
+                    : '💪'}
+            </motion.div>
             <h3 className="text-2xl font-bold mb-1">
               {totalCorrect}/{questions.length} Benar
             </h3>
-            <p className="text-muted-foreground mb-2">
-              +{totalCorrect} ⭐ bintang
-            </p>
+
+            {totalCorrect === questions.length && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-primary font-semibold mb-1"
+              >
+                Sempurna! +20 XP bonus 🌟
+              </motion.p>
+            )}
+
             <p className="text-sm text-muted-foreground mb-8">
-              {totalCorrect >= 4
-                ? 'Luar biasa! Kamu hebat!'
-                : totalCorrect >= 2
-                  ? 'Bagus, terus berlatih!'
-                  : 'Jangan menyerah, coba lagi!'}
+              {totalCorrect === questions.length
+                ? 'Luar biasa! Kamu sempurna!'
+                : totalCorrect >= 4
+                  ? 'Keren banget!'
+                  : totalCorrect >= 2
+                    ? 'Bagus, terus berlatih!'
+                    : 'Jangan menyerah, coba lagi!'}
             </p>
 
             <div className="flex gap-3">
               <Button
                 variant="outline"
                 className="flex-1 rounded-xl h-12"
-                onClick={() => setPhase('select')}
+                onClick={() => {
+                  playTap();
+                  setPhase('select');
+                }}
               >
                 <RotateCcw size={16} className="mr-2" />
                 Ganti Mapel
               </Button>
               <Button
                 className="flex-1 rounded-xl h-12"
-                onClick={() => generateQuiz(subject)}
+                onClick={() => {
+                  playTap();
+                  generateQuiz(subject);
+                }}
               >
                 Coba Lagi
               </Button>
