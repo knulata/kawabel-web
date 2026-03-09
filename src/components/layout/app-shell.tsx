@@ -117,7 +117,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </div>
             )}
 
-            {student ? (
+            {student?.email ? (
               <>
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={student.avatar_url} alt={student.name} />

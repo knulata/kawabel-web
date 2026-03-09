@@ -79,9 +79,19 @@ export function SignInButton() {
     setError(null);
     try {
       const result = await loginWithGoogle(response.credential);
-      setStudent(result.student);
+      // Merge guest name/grade into the signed-in student if they were set during onboarding
+      const current = useStudent.getState().student;
+      const merged = { ...result.student };
+      if (current?.name && !result.student.name) {
+        merged.name = current.name;
+      }
+      if (current?.grade && current.grade !== 'SD') {
+        merged.grade = current.grade;
+      }
+      setStudent(merged);
       setShowPopover(false);
     } catch (err) {
+      // Don't wipe guest student on auth error
       setError(err instanceof Error ? err.message : 'Login gagal, coba lagi.');
     } finally {
       setIsSigningIn(false);
