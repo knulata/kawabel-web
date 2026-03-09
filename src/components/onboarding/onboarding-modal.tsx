@@ -69,7 +69,7 @@ export function OnboardingModal() {
               Halo! Siapa namamu?
             </h2>
             <p className="text-sm text-muted-foreground text-center mb-5">
-              Aku Kawabel si burung hantu, teman belajarmu!
+              Aku Kawabel, kawan belajarmu!
             </p>
 
             <input
