@@ -158,6 +158,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <main className="flex-1 max-w-5xl mx-auto w-full pb-20 sm:pb-0">{children}</main>
 
+      {/* Footer links */}
+      <div className="text-center py-3 text-[10px] text-muted-foreground/60 sm:pb-2 hidden sm:block">
+        <Link href="/privacy" className="hover:underline">Privasi</Link>
+        <span className="mx-1.5">·</span>
+        <Link href="/terms" className="hover:underline">Ketentuan</Link>
+      </div>
+
       {/* Bottom navigation (mobile) */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 glass border-t border-border/50 sm:hidden">
         <div className="flex justify-around py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]">

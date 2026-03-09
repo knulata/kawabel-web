@@ -37,7 +37,7 @@ const MAIN_FEATURES = [
   {
     id: 'photo',
     title: 'Foto Soal',
-    desc: 'Untuk dapat penjelasan',
+    desc: 'Untuk mendapatkan penjelasan',
     emoji: '📸',
     href: '/chat?photo=1',
     gradient: 'from-sky-400 to-blue-600',
@@ -420,6 +420,13 @@ export function HomePage() {
           </motion.div>
         </div>
       )}
+
+      {/* Footer links */}
+      <div className="text-center pt-6 pb-2 text-[10px] text-muted-foreground/50">
+        <Link href="/privacy" className="hover:underline">Privasi</Link>
+        <span className="mx-1.5">·</span>
+        <Link href="/terms" className="hover:underline">Ketentuan</Link>
+      </div>
     </div>
   );
 }

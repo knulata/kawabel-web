@@ -66,6 +66,11 @@ export default function RootLayout({
     <html lang="id" className={`${poppins.variable} ${nunito.variable}`}>
       <body className="font-sans antialiased">
         {children}
+        <footer className="text-center py-2 text-[10px] text-gray-400">
+          <a href="/privacy">Kebijakan Privasi</a>
+          {' · '}
+          <a href="/terms">Syarat & Ketentuan</a>
+        </footer>
       </body>
     </html>
   );
