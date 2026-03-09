@@ -7,10 +7,11 @@ import { useStudent } from '@/store/use-student';
 import { useGamification } from '@/store/use-gamification';
 import { playTap } from '@/lib/sounds';
 import { hapticLight } from '@/lib/haptics';
-import { Camera, Send, ArrowDown, Trash2 } from 'lucide-react';
+import { Camera, Mic, Send, ArrowDown, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ChatBubble } from '@/components/chat/chat-bubble';
+import { PermissionGuide, usePermission } from '@/components/chat/permission-guide';
 
 export function ChatPage() {
   const { student } = useStudent();
@@ -19,9 +20,15 @@ export function ChatPage() {
   const [input, setInput] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
+  const [showPermGuide, setShowPermGuide] = useState<'camera' | 'microphone' | null>(null);
+  const [isListening, setIsListening] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  const cameraPerm = usePermission('camera');
+  const micPerm = usePermission('microphone');
 
   const scrollToBottom = useCallback(() => {
     scrollRef.current?.scrollTo({
@@ -70,6 +77,21 @@ export function ChatPage() {
     }
   };
 
+  const handleCameraClick = async () => {
+    if (cameraPerm.status === 'denied') {
+      setShowPermGuide('camera');
+      return;
+    }
+    if (cameraPerm.status === 'prompt') {
+      const granted = await cameraPerm.request();
+      if (!granted) {
+        setShowPermGuide('camera');
+        return;
+      }
+    }
+    fileInputRef.current?.click();
+  };
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -77,6 +99,63 @@ export function ChatPage() {
     reader.onload = () => setImagePreview(reader.result as string);
     reader.readAsDataURL(file);
     e.target.value = '';
+  };
+
+  const handleVoiceClick = async () => {
+    // Already listening — stop
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    // Check browser support
+    const SpeechRecognition = (window as unknown as Record<string, unknown>).SpeechRecognition ||
+      (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setShowPermGuide('microphone');
+      return;
+    }
+
+    // Check permission
+    if (micPerm.status === 'denied') {
+      setShowPermGuide('microphone');
+      return;
+    }
+    if (micPerm.status === 'prompt') {
+      const granted = await micPerm.request();
+      if (!granted) {
+        setShowPermGuide('microphone');
+        return;
+      }
+    }
+
+    const recognition = new (SpeechRecognition as new () => SpeechRecognition)();
+    recognition.lang = 'id-ID';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[0][0].transcript;
+      setInput((prev) => (prev ? prev + ' ' + transcript : transcript));
+      setIsListening(false);
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+      if (micPerm.status !== 'granted') {
+        setShowPermGuide('microphone');
+      }
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+    hapticLight();
   };
 
   return (
@@ -210,6 +289,23 @@ export function ChatPage() {
         )}
       </AnimatePresence>
 
+      {/* Permission guide */}
+      <AnimatePresence>
+        {showPermGuide && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="px-4 py-2"
+          >
+            <PermissionGuide
+              type={showPermGuide}
+              onDismiss={() => setShowPermGuide(null)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Input bar */}
       <div className="px-4 py-3 border-t border-border/50 glass">
         <div className="flex items-end gap-2 max-w-3xl mx-auto">
@@ -224,10 +320,19 @@ export function ChatPage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={handleCameraClick}
             className="shrink-0 text-muted-foreground"
           >
             <Camera size={20} />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleVoiceClick}
+            className={`shrink-0 ${isListening ? 'text-red-500 animate-pulse' : 'text-muted-foreground'}`}
+          >
+            <Mic size={20} />
           </Button>
 
           <Textarea
@@ -235,7 +340,7 @@ export function ChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Tanya Kawi..."
+            placeholder={isListening ? 'Mendengarkan...' : 'Tanya Kawi...'}
             className="min-h-[40px] max-h-32 resize-none rounded-2xl bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary"
             rows={1}
           />
