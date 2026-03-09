@@ -417,7 +417,7 @@ Be lenient with minor stroke imperfections but check character accuracy. Match a
                   <Mascot size="lg" className="mx-auto mb-3" />
                   <h3 className="font-bold text-lg">Langkah 1: Foto Daftar Kata</h3>
                   <p className="text-base text-muted-foreground mt-1">
-                    Foto halaman buku yang berisi kata-kata Mandarin yang ingin didiktekan
+                    Foto halaman buku yang berisi kata-kata Mandarin yang ingin di diktekan
                   </p>
                 </div>
 
