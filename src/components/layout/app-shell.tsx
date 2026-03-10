@@ -36,7 +36,7 @@ const NAV_ITEMS = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { student, logout } = useStudent();
+  const { student, logout, setStudent } = useStudent();
   const { xp, gems, streak, checkStreak, regenHearts } = useGamification();
   const level = getLevelFromXP(xp);
   const [showSignInHint, setShowSignInHint] = useState(false);
@@ -46,6 +46,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     checkStreak();
     regenHearts();
   }, [checkStreak, regenHearts]);
+
+  // Migrate: generate parent_code for existing students without one
+  useEffect(() => {
+    if (student?.name && !student.parent_code) {
+      const codeName = student.name.replace(/[^A-Za-z]/g, '').slice(0, 4).toUpperCase();
+      const codeNum = Math.floor(1000 + Math.random() * 9000);
+      setStudent({ ...student, parent_code: `${codeName}-${codeNum}` });
+    }
+  }, [student, setStudent]);
 
   // Track if onboarding was dismissed this session
   const [onboardingDone, setOnboardingDone] = useState(false);

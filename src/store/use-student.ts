@@ -13,12 +13,24 @@ interface StudentState {
   addStars: (n: number) => void;
 }
 
+function generateParentCode(name: string) {
+  const codeName = name.replace(/[^A-Za-z]/g, '').slice(0, 4).toUpperCase();
+  const codeNum = Math.floor(1000 + Math.random() * 9000);
+  return `${codeName}-${codeNum}`;
+}
+
 export const useStudent = create<StudentState>()(
   persist(
     (set) => ({
       student: null,
       isLoading: false,
-      setStudent: (student) => set({ student }),
+      setStudent: (student) => {
+        // Auto-generate parent_code if missing
+        if (student && student.name && !student.parent_code) {
+          student = { ...student, parent_code: generateParentCode(student.name) };
+        }
+        set({ student });
+      },
       setLoading: (isLoading) => set({ isLoading }),
       logout: () => set({ student: null }),
       addStars: (n) =>
