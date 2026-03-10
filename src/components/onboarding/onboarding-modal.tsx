@@ -31,14 +31,22 @@ export function OnboardingModal() {
     setStep('grade');
   }
 
+  function generateLocalCode(studentName: string) {
+    const codeName = studentName.replace(/[^A-Za-z]/g, '').slice(0, 4).toUpperCase();
+    const codeNum = Math.floor(1000 + Math.random() * 9000);
+    return `${codeName}-${codeNum}`;
+  }
+
   function handleFinish() {
     if (!grade) return;
+    const trimmedName = name.trim();
     setStudent({
       id: 0,
-      name: name.trim(),
+      name: trimmedName,
       grade,
       stars: 0,
       level: 1,
+      parent_code: generateLocalCode(trimmedName),
     });
   }
 

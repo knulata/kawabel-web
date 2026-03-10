@@ -398,7 +398,7 @@ export function HomePage() {
             </motion.div>
           )}
 
-          {/* Parent share code */}
+          {/* Parent share code — shown for all users */}
           {student?.parent_code && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -411,9 +411,10 @@ export function HomePage() {
                     <Share2 size={16} className="text-blue-500" />
                     <h3 className="text-sm font-bold text-foreground">Bagikan ke Orang Tua</h3>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Orang tua bisa lihat progress belajarmu di{' '}
-                    <span className="font-semibold">kawabel.com/parent</span>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {student.email
+                      ? <>Orang tua bisa lihat progress belajarmu di <span className="font-semibold">kawabel.com/parent</span></>
+                      : 'Kirim kode ini ke orang tua agar bisa melihat progressmu'}
                   </p>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 px-3 py-2 rounded-lg bg-white border border-blue-200 font-mono font-bold text-center tracking-wider text-blue-700">
@@ -421,7 +422,10 @@ export function HomePage() {
                     </div>
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(student.parent_code!);
+                        const msg = student.email
+                          ? `Kode Kawabel anak: ${student.parent_code}\nLihat progress di kawabel.com/parent`
+                          : `Kode Kawabel anak: ${student.parent_code}\nMasuk dengan Google untuk melihat progress online di kawabel.com/parent`;
+                        navigator.clipboard.writeText(msg);
                         setCodeCopied(true);
                         setTimeout(() => setCodeCopied(false), 2000);
                       }}
@@ -430,6 +434,11 @@ export function HomePage() {
                       {codeCopied ? 'Tersalin!' : 'Salin'}
                     </button>
                   </div>
+                  {!student.email && (
+                    <p className="text-[10px] text-blue-500/70 mt-2">
+                      Masuk dengan Google agar orang tua bisa pantau online dari HP mereka
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
