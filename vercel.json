@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/:path(.*)",
+      "has": [{ "type": "host", "value": "www.kawabel.com" }],
+      "destination": "https://kawabel.com/:path",
+      "permanent": true
+    }
+  ]
+}
