@@ -72,7 +72,7 @@ export function HomePage() {
   const [codeCopied, setCodeCopied] = useState(false);
 
   const firstName = student?.name?.split(' ')[0] || null;
-  const isNewUser = xp === 0;
+  const isNewUser = !student?.name;
 
   const handleFeatureTap = () => {
     playTap();
