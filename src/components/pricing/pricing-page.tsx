@@ -7,7 +7,7 @@ import { Mascot } from '@/components/mascot';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/store/use-subscription';
-import { SUBSCRIPTION_PRICE, FIRST_MONTH_PRICE } from '@/lib/constants';
+import { SUBSCRIPTION_PRICE } from '@/lib/constants';
 import { PaymentSheet } from '@/components/pricing/payment-sheet';
 import {
   Check,
@@ -68,8 +68,8 @@ const FAQ_ITEMS = [
     a: 'Pembayaran melalui transfer bank BCA. Setelah transfer, upload bukti pembayaran dan tim kami akan verifikasi dalam 1x24 jam.',
   },
   {
-    q: 'Kenapa bulan pertama lebih murah?',
-    a: 'Kami ingin kamu merasakan manfaat Kawabel dulu. Bulan pertama hanya Rp 99.000 supaya kamu bisa coba tanpa risiko. Setelah itu Rp 199.000/bulan.',
+    q: 'Berapa biaya langganan?',
+    a: 'Langganan Premium Rp 750.000/bulan per siswa. Kamu juga mendapat 7 hari gratis untuk mencoba semua fitur tanpa risiko.',
   },
   {
     q: 'Apa yang terjadi setelah masa percobaan?',
@@ -261,7 +261,7 @@ export function PricingPage() {
           transition={{ delay: 0.2 }}
           className="text-sm text-muted-foreground mt-1"
         >
-          Lebih murah dari 1x makan siang!
+          Investasi terbaik untuk masa depan anak
         </motion.p>
       </motion.div>
 
@@ -317,7 +317,7 @@ export function PricingPage() {
                 className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-bold shadow-md flex items-center gap-1"
               >
                 <Zap size={12} />
-                Bulan pertama cuma Rp 99rb!
+                Per siswa / bulan
               </motion.div>
             </div>
 
@@ -332,18 +332,11 @@ export function PricingPage() {
                 )}
               </div>
 
-              {/* Price with promo */}
+              {/* Price */}
               <div className="mb-1">
-                <div className="flex items-baseline gap-2">
-                  <p className="text-2xl font-black text-foreground">
-                    Rp {formatPrice(FIRST_MONTH_PRICE)}
-                  </p>
-                  <span className="text-sm text-muted-foreground line-through">
-                    Rp {formatPrice(SUBSCRIPTION_PRICE)}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  bulan pertama, lalu Rp {formatPrice(SUBSCRIPTION_PRICE)}/bulan
+                <p className="text-2xl font-black text-foreground">
+                  Rp {formatPrice(SUBSCRIPTION_PRICE)}
+                  <span className="text-sm font-normal text-muted-foreground">/bulan per siswa</span>
                 </p>
               </div>
 
@@ -378,7 +371,7 @@ export function PricingPage() {
                       className="w-full h-12 text-base font-bold rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md"
                     >
                       <Crown size={18} className="mr-2" />
-                      Mulai Rp {formatPrice(FIRST_MONTH_PRICE)}/bulan
+                      Langganan Rp {formatPrice(SUBSCRIPTION_PRICE)}/bulan
                     </Button>
                     <p className="text-center text-xs text-muted-foreground mt-2">
                       + gratis 7 hari pertama!
@@ -399,7 +392,7 @@ export function PricingPage() {
         className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100"
       >
         <p className="text-sm text-green-800 font-medium text-center">
-          Lebih hemat dari les privat (Rp&nbsp;200rb/pertemuan). Kawabel siap bantu 24/7 kapan saja.
+          Lebih hemat dari les privat (Rp&nbsp;1-2jt/bulan). Kawabel siap bantu 24/7 kapan saja.
         </p>
       </motion.div>
 
