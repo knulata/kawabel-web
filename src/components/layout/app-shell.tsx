@@ -25,8 +25,9 @@ import { HeartsDisplay } from '@/components/home/hearts-display';
 import { Mascot } from '@/components/mascot';
 import { SignInButton } from '@/components/auth/sign-in-button';
 import { OnboardingModal } from '@/components/onboarding/onboarding-modal';
+import { useLanguage, useT } from '@/store/use-language';
 
-const NAV_ITEMS = [
+const NAV_ITEMS_ID = [
   { href: '/', icon: Home, label: 'Beranda' },
   { href: '/chat', icon: MessageCircle, label: 'Tanya' },
   { href: '/dictation', icon: PenLine, label: 'Dikte' },
@@ -34,9 +35,20 @@ const NAV_ITEMS = [
   { href: '/leaderboard', icon: Trophy, label: 'Juara' },
 ];
 
+const NAV_ITEMS_EN = [
+  { href: '/', icon: Home, label: 'Home' },
+  { href: '/chat', icon: MessageCircle, label: 'Ask' },
+  { href: '/dictation', icon: PenLine, label: 'Dictation' },
+  { href: '/test-prep', icon: BookOpen, label: 'Exam' },
+  { href: '/leaderboard', icon: Trophy, label: 'Rank' },
+];
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { student, logout, setStudent } = useStudent();
+  const { lang, setLang } = useLanguage();
+  const t = useT();
+  const NAV_ITEMS = lang === 'en' ? NAV_ITEMS_EN : NAV_ITEMS_ID;
   const { xp, gems, streak, checkStreak, regenHearts } = useGamification();
   const level = getLevelFromXP(xp);
   const [showSignInHint, setShowSignInHint] = useState(false);
@@ -93,6 +105,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Language toggle */}
+            <button
+              onClick={() => { setLang(lang === 'id' ? 'en' : 'id'); playTap(); }}
+              className="px-1.5 py-0.5 rounded-md text-[10px] font-bold border border-border hover:bg-muted transition-colors"
+              title={lang === 'id' ? 'Switch to English' : 'Ganti ke Indonesia'}
+            >
+              {lang === 'id' ? 'EN' : 'ID'}
+            </button>
+
             {/* Streak */}
             {streak > 0 && (
               <motion.div
@@ -179,11 +200,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Footer links */}
       <div className="text-center py-3 text-[10px] text-muted-foreground/60 sm:pb-2 hidden sm:block">
-        <Link href="/parent" className="hover:underline">Orang Tua</Link>
+        <Link href="/parent" className="hover:underline">{t('parent')}</Link>
         <span className="mx-1.5">·</span>
-        <Link href="/privacy" className="hover:underline">Privasi</Link>
+        <Link href="/privacy" className="hover:underline">{t('privacy')}</Link>
         <span className="mx-1.5">·</span>
-        <Link href="/terms" className="hover:underline">Ketentuan</Link>
+        <Link href="/terms" className="hover:underline">{t('terms')}</Link>
       </div>
 
       {/* Bottom navigation (mobile) */}

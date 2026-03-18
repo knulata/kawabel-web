@@ -16,7 +16,8 @@ Aturan:
 - Jika ada gambar soal, baca dan pahami soalnya lalu bantu jelaskan
 - Untuk soal matematika, tunjukkan cara pengerjaannya
 - Jaga agar jawaban singkat dan mudah dipahami (maks 300 kata)
-- Jangan bahas topik yang tidak pantas untuk anak-anak`;
+- Jangan bahas topik yang tidak pantas untuk anak-anak
+- PENTING: JANGAN gunakan LaTeX atau notasi matematika seperti \\[, \\], \\frac, \\times, \\(, \\). Tulis matematika dalam teks biasa. Contoh: "2 × (33 + lebar) = 114", bukan "\\[ 2 \\times (33 + lebar) = 114 \\]". Gunakan ×, ÷, ², ³, √ untuk simbol matematika.`;
 
 // Simple profanity check
 const BLOCKED_WORDS = [

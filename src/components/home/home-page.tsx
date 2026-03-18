@@ -14,6 +14,7 @@ import { AchievementToast } from '@/components/home/achievement-toast';
 import { TrialBanner } from '@/components/pricing/trial-banner';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, Sparkles, Share2 } from 'lucide-react';
+import { useT } from '@/store/use-language';
 
 const container = {
   hidden: {},
@@ -25,45 +26,50 @@ const item = {
   show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 260, damping: 20 } },
 };
 
-const MAIN_FEATURES = [
-  {
-    id: 'chat',
-    title: 'Tanya PR',
-    desc: 'Ketik pertanyaan, langsung dijawab',
-    emoji: '💬',
-    href: '/chat',
-    gradient: 'from-green-400 to-emerald-600',
-  },
-  {
-    id: 'photo',
-    title: 'Foto Soal',
-    desc: 'Untuk mendapatkan penjelasan',
-    emoji: '📸',
-    href: '/chat?photo=1',
-    gradient: 'from-sky-400 to-blue-600',
-  },
-  {
-    id: 'dictation',
-    title: 'Dikte',
-    desc: 'Foto daftar kata, dengarkan & tulis',
-    emoji: '🀄',
-    href: '/dictation',
-    gradient: 'from-rose-400 to-red-600',
-  },
-  {
-    id: 'test',
-    title: 'Latihan Ujian',
-    desc: 'Foto buku atau pilih topik, langsung buat kuis',
-    emoji: '📝',
-    href: '/test-prep',
-    gradient: 'from-violet-400 to-purple-600',
-  },
-];
+function useFeatures() {
+  const t = useT();
+  return [
+    {
+      id: 'chat',
+      title: t('askHomework'),
+      desc: t('askHomeworkDesc'),
+      emoji: '💬',
+      href: '/chat',
+      gradient: 'from-green-400 to-emerald-600',
+    },
+    {
+      id: 'photo',
+      title: t('photoQuestion'),
+      desc: t('photoQuestionDesc'),
+      emoji: '📸',
+      href: '/chat?photo=1',
+      gradient: 'from-sky-400 to-blue-600',
+    },
+    {
+      id: 'dictation',
+      title: t('dictation'),
+      desc: t('dictationDesc'),
+      emoji: '🀄',
+      href: '/dictation',
+      gradient: 'from-rose-400 to-red-600',
+    },
+    {
+      id: 'test',
+      title: t('examPractice'),
+      desc: t('examPracticeDesc'),
+      emoji: '📝',
+      href: '/test-prep',
+      gradient: 'from-violet-400 to-purple-600',
+    },
+  ];
+}
 
 export function HomePage() {
   const { student } = useStudent();
   const { xp, streak, dailyXP, dailyGoalXP, achievements, chestsAvailable } =
     useGamification();
+  const t = useT();
+  const MAIN_FEATURES = useFeatures();
   const level = getLevelFromXP(xp);
   const { current, needed } = getXPForNextLevel(xp);
   const xpPct = Math.min((current / needed) * 100, 100);
@@ -117,7 +123,7 @@ export function HomePage() {
               className="text-3xl font-bold text-white"
               style={{ fontFamily: 'var(--font-nunito)' }}
             >
-              {firstName ? `Halo ${firstName}!` : 'Kawan Belajar AI-mu'}
+              {firstName ? `${t('greeting')} ${firstName}!` : t('yourAIFriend')}
             </motion.h1>
 
             <motion.p
@@ -126,7 +132,7 @@ export function HomePage() {
               transition={{ delay: 0.2 }}
               className="text-white/70 text-sm mt-2 max-w-xs mx-auto leading-relaxed"
             >
-              Tanya PR, foto soal, latihan ujian, dan dikte — semua dibantu AI, kapan saja.
+              {t('heroSubtitle')}
             </motion.p>
 
             <motion.div
@@ -137,7 +143,7 @@ export function HomePage() {
             >
               <Link href="/chat" onClick={handleFeatureTap}>
                 <button className="px-6 py-3 bg-white text-primary font-bold rounded-xl shadow-lg text-base hover:bg-white/90 transition-colors">
-                  Mulai Tanya Sekarang
+                  {t('startAskNow')}
                 </button>
               </Link>
             </motion.div>
@@ -153,7 +159,7 @@ export function HomePage() {
               className="space-y-3"
             >
               <h3 className="text-base font-bold text-foreground">
-                Apa yang bisa {MASCOT_NAME} bantu?
+                {t('whatCanHelp')}
               </h3>
 
               {MAIN_FEATURES.map((feature) => (
@@ -191,13 +197,13 @@ export function HomePage() {
               <Card className="shadow-sm border-border/40 overflow-hidden">
                 <CardContent className="p-0">
                   <div className="bg-muted/30 px-4 py-3 border-b border-border/30">
-                    <h3 className="text-base font-bold text-foreground">Cara pakai</h3>
+                    <h3 className="text-base font-bold text-foreground">{t('howToUse')}</h3>
                   </div>
                   <div className="p-4 space-y-3">
                     {[
-                      { num: '1', text: 'Pilih fitur di atas atau langsung ketik pertanyaan' },
-                      { num: '2', text: 'Kawabel jelaskan jawaban langkah demi langkah' },
-                      { num: '3', text: 'Kumpulkan XP dan naik level sambil belajar!' },
+                      { num: '1', text: t('step1') },
+                      { num: '2', text: t('step2') },
+                      { num: '3', text: t('step3') },
                     ].map((step) => (
                       <div key={step.num} className="flex items-start gap-3">
                         <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
@@ -243,10 +249,10 @@ export function HomePage() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h2 className="text-2xl font-bold text-foreground">
-              Halo, {firstName || 'Kawan'}! 👋
+              {t('greeting')}, {firstName || 'Kawan'}! 👋
             </h2>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Mau belajar apa hari ini?
+              {t('whatToStudy')}
             </p>
           </motion.div>
 
@@ -264,7 +270,7 @@ export function HomePage() {
                 : 'bg-muted border border-border text-muted-foreground'
             }`}>
               <span>{streak > 0 ? '🔥' : '❄️'}</span>
-              <span>{streak} hari</span>
+              <span>{streak} {t('days')}</span>
             </div>
 
             {/* Daily progress */}
@@ -324,7 +330,7 @@ export function HomePage() {
             animate="show"
             className="space-y-3"
           >
-            <h3 className="text-base font-bold text-foreground">Lanjut Belajar</h3>
+            <h3 className="text-base font-bold text-foreground">{t('continueStudying')}</h3>
 
             {MAIN_FEATURES.map((feature) => (
               <motion.div key={feature.id} variants={item}>
@@ -362,7 +368,7 @@ export function HomePage() {
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-base font-bold text-foreground flex items-center gap-1.5">
                   <Sparkles size={14} className="text-amber-500" />
-                  Pencapaian
+                  {t('achievements')}
                 </h3>
                 <span className="text-[11px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                   {achievements.length}/{ACHIEVEMENTS.length}
@@ -409,12 +415,12 @@ export function HomePage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Share2 size={16} className="text-blue-500" />
-                    <h3 className="text-sm font-bold text-foreground">Bagikan ke Orang Tua</h3>
+                    <h3 className="text-sm font-bold text-foreground">{t('shareToParent')}</h3>
                   </div>
                   <p className="text-xs text-muted-foreground mb-2">
                     {student.email
-                      ? <>Orang tua bisa lihat progress belajarmu di <span className="font-semibold">kawabel.com/parent</span></>
-                      : 'Kirim kode ini ke orang tua agar bisa melihat progressmu'}
+                      ? <>{t('parentCanSee')} <span className="font-semibold">kawabel.com/parent</span></>
+                      : t('sendCodeToParent')}
                   </p>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 px-3 py-2 rounded-lg bg-white border border-blue-200 font-mono font-bold text-center tracking-wider text-blue-700">
@@ -431,12 +437,12 @@ export function HomePage() {
                       }}
                       className="px-3 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
                     >
-                      {codeCopied ? 'Tersalin!' : 'Salin'}
+                      {codeCopied ? t('copied') : t('copy')}
                     </button>
                   </div>
                   {!student.email && (
                     <p className="text-[10px] text-blue-500/70 mt-2">
-                      Masuk dengan Google agar orang tua bisa pantau online dari HP mereka
+                      {t('signInForOnline')}
                     </p>
                   )}
                 </CardContent>
@@ -457,8 +463,8 @@ export function HomePage() {
                     <Sparkles size={20} className="text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-base font-semibold text-foreground">Belajar tanpa batas</p>
-                    <p className="text-sm text-muted-foreground">Upgrade Premium — gratis 7 hari</p>
+                    <p className="text-base font-semibold text-foreground">{t('learnUnlimited')}</p>
+                    <p className="text-sm text-muted-foreground">{t('upgradePremium')}</p>
                   </div>
                   <ArrowRight size={16} className="text-primary" />
                 </CardContent>
@@ -470,11 +476,11 @@ export function HomePage() {
 
       {/* Footer links */}
       <div className="text-center pt-6 pb-2 text-[10px] text-muted-foreground/50">
-        <Link href="/parent" className="hover:underline">Orang Tua</Link>
+        <Link href="/parent" className="hover:underline">{t('parent')}</Link>
         <span className="mx-1.5">·</span>
-        <Link href="/privacy" className="hover:underline">Privasi</Link>
+        <Link href="/privacy" className="hover:underline">{t('privacy')}</Link>
         <span className="mx-1.5">·</span>
-        <Link href="/terms" className="hover:underline">Ketentuan</Link>
+        <Link href="/terms" className="hover:underline">{t('terms')}</Link>
       </div>
     </div>
   );

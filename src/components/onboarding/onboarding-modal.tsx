@@ -3,25 +3,27 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useStudent } from '@/store/use-student';
+import { useT } from '@/store/use-language';
 import { Mascot } from '@/components/mascot';
 
 const GRADES = [
-  { value: 'SD-1', label: 'SD Kelas 1' },
-  { value: 'SD-2', label: 'SD Kelas 2' },
-  { value: 'SD-3', label: 'SD Kelas 3' },
-  { value: 'SD-4', label: 'SD Kelas 4' },
-  { value: 'SD-5', label: 'SD Kelas 5' },
-  { value: 'SD-6', label: 'SD Kelas 6' },
-  { value: 'SMP-7', label: 'SMP Kelas 7' },
-  { value: 'SMP-8', label: 'SMP Kelas 8' },
-  { value: 'SMP-9', label: 'SMP Kelas 9' },
-  { value: 'SMA-10', label: 'SMA Kelas 10' },
-  { value: 'SMA-11', label: 'SMA Kelas 11' },
-  { value: 'SMA-12', label: 'SMA Kelas 12' },
+  { value: 'SD-1', label: 'SD Kelas 1', labelEn: 'Grade 1' },
+  { value: 'SD-2', label: 'SD Kelas 2', labelEn: 'Grade 2' },
+  { value: 'SD-3', label: 'SD Kelas 3', labelEn: 'Grade 3' },
+  { value: 'SD-4', label: 'SD Kelas 4', labelEn: 'Grade 4' },
+  { value: 'SD-5', label: 'SD Kelas 5', labelEn: 'Grade 5' },
+  { value: 'SD-6', label: 'SD Kelas 6', labelEn: 'Grade 6' },
+  { value: 'SMP-7', label: 'SMP Kelas 7', labelEn: 'Grade 7' },
+  { value: 'SMP-8', label: 'SMP Kelas 8', labelEn: 'Grade 8' },
+  { value: 'SMP-9', label: 'SMP Kelas 9', labelEn: 'Grade 9' },
+  { value: 'SMA-10', label: 'SMA Kelas 10', labelEn: 'Grade 10' },
+  { value: 'SMA-11', label: 'SMA Kelas 11', labelEn: 'Grade 11' },
+  { value: 'SMA-12', label: 'SMA Kelas 12', labelEn: 'Grade 12' },
 ];
 
 export function OnboardingModal() {
   const { setStudent } = useStudent();
+  const t = useT();
   const [name, setName] = useState('');
   const [grade, setGrade] = useState('');
   const [step, setStep] = useState<'name' | 'grade'>('name');
@@ -50,6 +52,8 @@ export function OnboardingModal() {
     });
   }
 
+  const isEN = t('next') === 'Next';
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -74,10 +78,10 @@ export function OnboardingModal() {
               className="text-2xl font-black text-center text-foreground mb-1"
               style={{ fontFamily: 'var(--font-nunito)' }}
             >
-              Halo! Siapa namamu?
+              {t('whatsYourName')}
             </h2>
             <p className="text-sm text-muted-foreground text-center mb-5">
-              Aku Kawabel, kawan belajarmu!
+              {t('imKawabel')}
             </p>
 
             <input
@@ -85,7 +89,7 @@ export function OnboardingModal() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleNameNext()}
-              placeholder="Ketik namamu..."
+              placeholder={t('typeName')}
               autoFocus
               className="w-full px-4 py-3 rounded-xl border border-border bg-muted/30 text-base font-medium text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
               maxLength={30}
@@ -96,7 +100,7 @@ export function OnboardingModal() {
               disabled={name.trim().length < 2}
               className="w-full mt-4 py-3 rounded-xl bg-primary text-white font-bold text-base disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
             >
-              Lanjut
+              {t('next')}
             </button>
           </>
         ) : (
@@ -105,10 +109,10 @@ export function OnboardingModal() {
               className="text-2xl font-black text-center text-foreground mb-1"
               style={{ fontFamily: 'var(--font-nunito)' }}
             >
-              Kelas berapa, {name.trim().split(' ')[0]}?
+              {t('whatGrade')} {name.trim().split(' ')[0]}?
             </h2>
             <p className="text-sm text-muted-foreground text-center mb-4">
-              Biar Kawabel bisa bantu sesuai pelajaranmu
+              {t('soKawabelCanHelp')}
             </p>
 
             <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
@@ -122,7 +126,7 @@ export function OnboardingModal() {
                       : 'bg-white border-border hover:border-primary/50 text-foreground'
                   }`}
                 >
-                  {g.label}
+                  {isEN ? g.labelEn : g.label}
                 </button>
               ))}
             </div>
@@ -132,14 +136,14 @@ export function OnboardingModal() {
                 onClick={() => setStep('name')}
                 className="flex-1 py-3 rounded-xl border border-border text-foreground font-medium hover:bg-muted/50 transition-colors"
               >
-                Kembali
+                {t('back')}
               </button>
               <button
                 onClick={handleFinish}
                 disabled={!grade}
                 className="flex-1 py-3 rounded-xl bg-primary text-white font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
               >
-                Mulai Belajar!
+                {t('startLearning')}
               </button>
             </div>
           </>
