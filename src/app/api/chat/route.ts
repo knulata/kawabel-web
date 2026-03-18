@@ -52,8 +52,8 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Determine model
-    const useModel = model === 'full' ? 'gpt-4o' : 'gpt-4o-mini';
+    // Use gpt-4o for all requests (better accuracy for math & reasoning)
+    const useModel = model === 'full' ? 'gpt-4o' : 'gpt-4o';
 
     const completion = await getOpenAI().chat.completions.create({
       model: useModel,

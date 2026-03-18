@@ -14,7 +14,7 @@ import { AchievementToast } from '@/components/home/achievement-toast';
 import { TrialBanner } from '@/components/pricing/trial-banner';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, Sparkles, Share2 } from 'lucide-react';
-import { useT } from '@/store/use-language';
+import { useLanguage, useT } from '@/store/use-language';
 
 const container = {
   hidden: {},
@@ -69,6 +69,8 @@ export function HomePage() {
   const { xp, streak, dailyXP, dailyGoalXP, achievements, chestsAvailable } =
     useGamification();
   const t = useT();
+  const { lang } = useLanguage();
+  const isEN = lang === 'en';
   const MAIN_FEATURES = useFeatures();
   const level = getLevelFromXP(xp);
   const { current, needed } = getXPForNextLevel(xp);
@@ -382,10 +384,10 @@ export function HomePage() {
                     <div
                       key={id}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200/70 text-sm shadow-sm"
-                      title={ach.description}
+                      title={isEN ? ach.descriptionEn : ach.description}
                     >
                       <span>{ach.icon}</span>
-                      <span className="text-xs font-medium text-amber-800">{ach.name}</span>
+                      <span className="text-xs font-medium text-amber-800">{isEN ? ach.nameEn : ach.name}</span>
                     </div>
                   );
                 })}
