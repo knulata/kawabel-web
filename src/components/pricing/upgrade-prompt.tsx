@@ -7,14 +7,22 @@ import { Button } from '@/components/ui/button';
 import { Mascot } from '@/components/mascot';
 import { FREE_LIMITS } from '@/lib/constants';
 import { Crown, X } from 'lucide-react';
+import { useT } from '@/store/use-language';
 
 type Feature = keyof typeof FREE_LIMITS;
 
-const FEATURE_LABELS: Record<Feature, string> = {
+const FEATURE_LABELS_ID: Record<Feature, string> = {
   chats: 'chat',
   photos: 'foto PR',
   quizzes: 'kuis',
   dictations: 'dikte',
+};
+
+const FEATURE_LABELS_EN: Record<Feature, string> = {
+  chats: 'chats',
+  photos: 'photo questions',
+  quizzes: 'quizzes',
+  dictations: 'dictations',
 };
 
 interface UpgradePromptProps {
@@ -25,8 +33,11 @@ interface UpgradePromptProps {
 
 export function UpgradePrompt({ open, feature, onDismiss }: UpgradePromptProps) {
   const router = useRouter();
+  const t = useT();
   const limit = FREE_LIMITS[feature];
-  const label = FEATURE_LABELS[feature];
+  // Use the right label based on language
+  const isEn = t('greeting') === 'Hello';
+  const label = isEn ? FEATURE_LABELS_EN[feature] : FEATURE_LABELS_ID[feature];
 
   const handleUpgrade = useCallback(() => {
     onDismiss();
@@ -81,7 +92,7 @@ export function UpgradePrompt({ open, feature, onDismiss }: UpgradePromptProps) 
                     transition={{ delay: 0.15 }}
                     className="text-lg font-bold text-foreground"
                   >
-                    Batas harian tercapai!
+                    {t('upgradeLimitReached')}
                   </motion.h3>
                   <motion.p
                     initial={{ opacity: 0 }}
@@ -89,7 +100,7 @@ export function UpgradePrompt({ open, feature, onDismiss }: UpgradePromptProps) 
                     transition={{ delay: 0.2 }}
                     className="text-sm text-muted-foreground mt-1"
                   >
-                    {limit}/{limit} {label} hari ini sudah digunakan
+                    {limit}/{limit} {label} {t('upgradeUsed')}
                   </motion.p>
                 </div>
 
@@ -104,7 +115,7 @@ export function UpgradePrompt({ open, feature, onDismiss }: UpgradePromptProps) 
                     <div className="h-full rounded-full bg-red-400 w-full" />
                   </div>
                   <p className="text-xs text-red-500 font-medium mt-1">
-                    {limit}/{limit} terpakai
+                    {limit}/{limit} {t('upgradeUsedCount')}
                   </p>
                 </motion.div>
 
@@ -120,14 +131,14 @@ export function UpgradePrompt({ open, feature, onDismiss }: UpgradePromptProps) 
                     className="w-full h-12 text-base font-bold rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md gap-2"
                   >
                     <Crown size={18} />
-                    Upgrade ke Premium
+                    {t('upgradeCTA')}
                   </Button>
 
                   <button
                     onClick={onDismiss}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Atau tunggu besok
+                    {t('upgradeOrWait')}
                   </button>
                 </motion.div>
 
@@ -139,7 +150,7 @@ export function UpgradePrompt({ open, feature, onDismiss }: UpgradePromptProps) 
                   className="text-xs text-muted-foreground"
                 >
 
-                  Gratis 7 hari + bulan pertama cuma Rp 99rb!
+                  {t('upgradeTrialHint')}
                 </motion.p>
               </div>
             </div>

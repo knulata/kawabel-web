@@ -32,7 +32,7 @@ function containsBlocked(text: string): boolean {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, model } = await req.json();
+    const { messages, model, student_id } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: 'Messages required' }, { status: 400 });
@@ -50,6 +50,59 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         reply: 'Yuk kita fokus belajar! 📚 Kawabel di sini untuk bantu pelajaranmu. Ada soal atau PR yang perlu dibantu?',
       });
+    }
+
+    // Server-side usage enforcement for signed-in users
+    if (student_id && student_id > 0) {
+      try {
+        const db = (await import('@/lib/supabase')).getSupabase();
+        const today = new Date().toISOString().slice(0, 10);
+
+        // Get or create daily usage
+        const { data: usage } = await db
+          .from('daily_usage')
+          .select('chats')
+          .eq('student_id', student_id)
+          .eq('date', today)
+          .single();
+
+        // Check subscription
+        const { data: sub } = await db
+          .from('subscriptions')
+          .select('plan, trial_start_date, premium_until')
+          .eq('student_id', student_id)
+          .single();
+
+        const isPremium = sub && (
+          (sub.plan === 'premium' && sub.premium_until && today <= sub.premium_until) ||
+          (sub.plan === 'trial' && sub.trial_start_date &&
+            Math.floor((new Date(today).getTime() - new Date(sub.trial_start_date).getTime()) / 86400000) < 7)
+        );
+
+        const limit = isPremium ? 100 : 5;
+        const currentChats = usage?.chats ?? 0;
+
+        if (currentChats >= limit) {
+          return NextResponse.json({
+            reply: isPremium
+              ? 'Kamu sudah banyak belajar hari ini! Istirahat dulu ya, lanjut besok.'
+              : 'Batas chat harian tercapai (5/hari). Upgrade ke Premium untuk unlimited! 🌟',
+          });
+        }
+
+        // Increment usage
+        await db.from('daily_usage').upsert({
+          student_id,
+          date: today,
+          chats: currentChats + 1,
+          photos: usage ? undefined : 0,
+          quizzes: usage ? undefined : 0,
+          dictations: usage ? undefined : 0,
+        }, { onConflict: 'student_id,date' });
+      } catch (err) {
+        console.error('Usage check error:', err);
+        // Don't block on usage check failure — continue
+      }
     }
 
     // Use gpt-4o for all requests (better accuracy for math & reasoning)

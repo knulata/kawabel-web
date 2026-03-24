@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Mascot } from '@/components/mascot';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, BookOpen, Award, ArrowLeft, TrendingUp } from 'lucide-react';
+import { useT } from '@/store/use-language';
 
 interface StudentInfo {
   id: number;
@@ -27,6 +28,7 @@ interface ProgressItem {
 }
 
 export default function ParentPage() {
+  const t = useT();
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +83,7 @@ export default function ParentPage() {
               kawabel
             </span>
           </div>
-          <span className="text-sm text-muted-foreground ml-1">Orang Tua</span>
+          <span className="text-sm text-muted-foreground ml-1">{t('parentLabel')}</span>
         </div>
       </header>
 
@@ -103,10 +105,10 @@ export default function ParentPage() {
                   className="text-2xl font-black text-foreground"
                   style={{ fontFamily: 'var(--font-nunito)' }}
                 >
-                  Lihat Progress Anak
+                  {t('parentTitle')}
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Masukkan kode dari anak Anda untuk melihat progress belajarnya
+                  {t('parentDesc')}
                 </p>
               </div>
 
@@ -119,7 +121,7 @@ export default function ParentPage() {
                     setError(null);
                   }}
                   onKeyDown={(e) => e.key === 'Enter' && handleLookup()}
-                  placeholder="Masukkan kode (contoh: BUDI-1234)"
+                  placeholder={t('parentPlaceholder')}
                   className="w-full px-4 py-3 rounded-xl border border-border bg-muted/30 text-center text-lg font-mono font-bold tracking-wider placeholder:text-muted-foreground/40 placeholder:tracking-normal placeholder:font-normal placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                   maxLength={12}
                   autoFocus
@@ -134,15 +136,15 @@ export default function ParentPage() {
                   disabled={loading || code.trim().length < 4}
                   className="w-full mt-3 py-3 rounded-xl bg-primary text-white font-bold disabled:opacity-40 hover:bg-primary/90 transition-colors"
                 >
-                  {loading ? 'Mencari...' : 'Lihat Progress'}
+                  {loading ? t('parentSearching') : t('parentSearch')}
                 </button>
               </div>
 
               <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
                 <p className="text-xs text-blue-700">
-                  <span className="font-semibold">Bagaimana cara mendapatkan kode?</span>
+                  <span className="font-semibold">{t('parentHow')}</span>
                   <br />
-                  Anak Anda bisa menemukan kode ini di halaman utama Kawabel setelah masuk dengan Google. Kode berupa kombinasi nama + angka unik.
+                  {t('parentHowDesc')}
                 </p>
               </div>
             </motion.div>
@@ -180,14 +182,14 @@ export default function ParentPage() {
                   <CardContent className="p-3 text-center">
                     <Award size={20} className="text-amber-500 mx-auto mb-1" />
                     <div className="text-lg font-bold">{student.stars}</div>
-                    <div className="text-[10px] text-muted-foreground">Bintang</div>
+                    <div className="text-[10px] text-muted-foreground">{t('parentStars')}</div>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-3 text-center">
                     <BookOpen size={20} className="text-blue-500 mx-auto mb-1" />
                     <div className="text-lg font-bold">{progress.length}</div>
-                    <div className="text-[10px] text-muted-foreground">Sesi Belajar</div>
+                    <div className="text-[10px] text-muted-foreground">{t('parentSessions')}</div>
                   </CardContent>
                 </Card>
                 <Card>
@@ -202,7 +204,7 @@ export default function ParentPage() {
                         : 0}
                       %
                     </div>
-                    <div className="text-[10px] text-muted-foreground">Rata-rata</div>
+                    <div className="text-[10px] text-muted-foreground">{t('parentAvg')}</div>
                   </CardContent>
                 </Card>
               </div>
@@ -210,7 +212,7 @@ export default function ParentPage() {
               {/* Progress by subject */}
               {Object.keys(bySubject).length > 0 ? (
                 <div className="space-y-3">
-                  <h3 className="text-base font-bold">Riwayat Belajar</h3>
+                  <h3 className="text-base font-bold">{t('parentHistory')}</h3>
                   {Object.entries(bySubject).map(([subject, items]) => (
                     <Card key={subject}>
                       <CardContent className="p-4">
@@ -237,7 +239,7 @@ export default function ParentPage() {
                 <Card>
                   <CardContent className="p-6 text-center">
                     <p className="text-sm text-muted-foreground">
-                      Belum ada riwayat belajar. Anak Anda baru mulai menggunakan Kawabel.
+                      {t('parentNoHistory')}
                     </p>
                   </CardContent>
                 </Card>
@@ -251,7 +253,7 @@ export default function ParentPage() {
                 }}
                 className="w-full py-2.5 rounded-xl border border-border text-sm font-medium hover:bg-muted/50 transition-colors"
               >
-                Cari Anak Lain
+                {t('parentSearchOther')}
               </button>
             </motion.div>
           )}

@@ -75,6 +75,8 @@ interface GamificationState {
   earnAchievement: (id: string) => void;
   regenHearts: () => void;
   refillHeartsWithGems: () => void;
+  syncToServer: (studentId: number) => void;
+  loadFromServer: (studentId: number) => Promise<void>;
 }
 
 const HEART_REGEN_MS = 30 * 60 * 1000; // 30 minutes
@@ -270,6 +272,76 @@ export const useGamification = create<GamificationState>()(
         if (state.gems >= 20) {
           set({ hearts: 5, gems: state.gems - 20, heartsLostAt: null });
           hapticSuccess();
+        }
+      },
+
+      syncToServer: (studentId) => {
+        const state = get();
+        fetch('/api/gamification/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            student_id: studentId,
+            state: {
+              xp: state.xp,
+              streak: state.streak,
+              lastActiveDate: state.lastActiveDate,
+              gems: state.gems,
+              hearts: state.hearts,
+              heartsLostAt: state.heartsLostAt,
+              chestsAvailable: state.chestsAvailable,
+              chestsOpened: state.chestsOpened,
+              achievements: state.achievements,
+              friendIds: state.friendIds,
+              dailyGoalXP: state.dailyGoalXP,
+              dailyXP: state.dailyXP,
+              dailyXPDate: state.dailyXPDate,
+              streakFreezes: state.streakFreezes,
+              combo: state.combo,
+              maxCombo: state.maxCombo,
+            },
+          }),
+        }).catch(() => {}); // fire-and-forget
+      },
+
+      loadFromServer: async (studentId) => {
+        try {
+          const res = await fetch(`/api/gamification/sync?student_id=${studentId}`);
+          const data = await res.json();
+          if (data.state) {
+            const local = get();
+            const server = data.state;
+            // Merge: take whichever has more XP (more progress)
+            if (server.xp > local.xp) {
+              set({
+                xp: server.xp,
+                streak: server.streak,
+                lastActiveDate: server.lastActiveDate,
+                gems: server.gems,
+                hearts: server.hearts,
+                heartsLostAt: server.heartsLostAt,
+                chestsAvailable: server.chestsAvailable,
+                chestsOpened: server.chestsOpened,
+                achievements: [...new Set([...local.achievements, ...server.achievements])],
+                friendIds: [...new Set([...local.friendIds, ...server.friendIds])],
+                dailyGoalXP: server.dailyGoalXP,
+                dailyXP: server.dailyXP,
+                dailyXPDate: server.dailyXPDate,
+                streakFreezes: server.streakFreezes,
+                combo: server.combo,
+                maxCombo: Math.max(local.maxCombo, server.maxCombo),
+              });
+            } else {
+              // Local has more XP but still merge achievements
+              set({
+                achievements: [...new Set([...local.achievements, ...server.achievements])],
+                friendIds: [...new Set([...local.friendIds, ...server.friendIds])],
+                maxCombo: Math.max(local.maxCombo, server.maxCombo),
+              });
+            }
+          }
+        } catch {
+          // silent — continue with local data
         }
       },
     }),

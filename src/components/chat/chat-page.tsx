@@ -15,12 +15,14 @@ import { PermissionGuide, usePermission } from '@/components/chat/permission-gui
 import { Mascot, MASCOT_NAME } from '@/components/mascot';
 import { useSubscription } from '@/store/use-subscription';
 import { UpgradePrompt } from '@/components/pricing/upgrade-prompt';
+import { useT } from '@/store/use-language';
 
 export function ChatPage() {
   const { student } = useStudent();
   const { messages, isLoading, error, sendMessage, clearMessages } = useChat();
   const { addXP, earnAchievement } = useGamification();
   const { canUse, incrementUsage } = useSubscription();
+  const t = useT();
   const [showUpgrade, setShowUpgrade] = useState<'chats' | 'photos' | null>(null);
   const [input, setInput] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -174,6 +176,8 @@ export function ChatPage() {
     hapticLight();
   };
 
+  const suggestions = [t('chatSuggestion1'), t('chatSuggestion2'), t('chatSuggestion3')];
+
   return (
     <div className="flex flex-col h-[calc(100dvh-7.5rem)] sm:h-[calc(100dvh-3.5rem)]">
       {/* Chat header — only show clear button when there are messages */}
@@ -186,7 +190,7 @@ export function ChatPage() {
             className="text-muted-foreground"
           >
             <Trash2 size={16} className="mr-1" />
-            Hapus
+            {t('chatDelete')}
           </Button>
         </div>
       )}
@@ -205,13 +209,13 @@ export function ChatPage() {
           >
             <Mascot size="2xl" className="mb-4" />
             <h3 className="text-xl font-semibold text-foreground">
-              Ada PR atau soal yang susah?
+              {t('chatEmpty')}
             </h3>
             <p className="text-base text-muted-foreground mt-1 max-w-xs">
-              Ketik pertanyaan atau foto soalmu — aku bantu jelaskan langkah demi langkah!
+              {t('chatEmptyDesc')}
             </p>
             <div className="flex flex-wrap gap-2 mt-6 justify-center">
-              {['Bantu PR Matematika', 'Jelaskan fotosintesis', 'Latihan soal'].map(
+              {suggestions.map(
                 (suggestion) => (
                   <button
                     key={suggestion}
@@ -349,7 +353,7 @@ export function ChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isListening ? 'Mendengarkan...' : 'Ketik pertanyaanmu...'}
+            placeholder={isListening ? t('chatListening') : t('chatPlaceholder')}
             className="min-h-[40px] max-h-32 resize-none rounded-2xl bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary"
             rows={1}
           />

@@ -9,12 +9,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, Medal, Award } from 'lucide-react';
+import { useT } from '@/store/use-language';
 import type { LeaderboardEntry } from '@/types';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
 export function LeaderboardPage() {
   const { student } = useStudent();
+  const t = useT();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<'week' | 'month' | 'all'>('week');
@@ -36,10 +38,10 @@ export function LeaderboardPage() {
       >
         <h2 className="text-2xl font-bold flex items-center gap-2">
           <Trophy size={24} className="text-amber-500" />
-          Papan Juara
+          {t('lbTitle')}
         </h2>
         <p className="text-base text-muted-foreground">
-          Siapa paling rajin belajar?
+          {t('lbSubtitle')}
         </p>
       </motion.div>
 
@@ -51,13 +53,13 @@ export function LeaderboardPage() {
       >
         <TabsList className="w-full">
           <TabsTrigger value="week" className="flex-1">
-            Minggu Ini
+            {t('lbWeek')}
           </TabsTrigger>
           <TabsTrigger value="month" className="flex-1">
-            Bulan Ini
+            {t('lbMonth')}
           </TabsTrigger>
           <TabsTrigger value="all" className="flex-1">
-            Semua
+            {t('lbAll')}
           </TabsTrigger>
         </TabsList>
       </Tabs>
@@ -71,7 +73,7 @@ export function LeaderboardPage() {
       ) : entries.length === 0 ? (
         <div className="text-center py-16">
           <span className="text-5xl mb-3 block">🏆</span>
-          <p className="text-muted-foreground">Belum ada data</p>
+          <p className="text-muted-foreground">{t('lbNoData')}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -122,7 +124,7 @@ export function LeaderboardPage() {
                         {entry.name}
                         {isMe && (
                           <span className="text-xs text-muted-foreground ml-1">
-                            (kamu)
+                            ({t('lbYou')})
                           </span>
                         )}
                       </p>

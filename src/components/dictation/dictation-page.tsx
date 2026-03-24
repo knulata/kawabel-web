@@ -13,6 +13,7 @@ import { UpgradePrompt } from '@/components/pricing/upgrade-prompt';
 import { Mascot, MASCOT_NAME } from '@/components/mascot';
 import { playTap, playCorrect, playWrong } from '@/lib/sounds';
 import { hapticLight, hapticSuccess, hapticError } from '@/lib/haptics';
+import { useT } from '@/store/use-language';
 import {
   Camera,
   Volume2,
@@ -46,6 +47,7 @@ export function DictationPage() {
   const { addXP, earnAchievement, combo } = useGamification();
   const { canUse, incrementUsage } = useSubscription();
   const cameraPerm = usePermission('camera');
+  const t = useT();
 
   const [phase, setPhase] = useState<Phase>('upload');
   const [words, setWords] = useState<DictationWord[]>([]);
@@ -357,18 +359,18 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <h2 className="text-2xl font-bold">✍️ Dikte</h2>
+        <h2 className="text-2xl font-bold">{t('dictTitle')}</h2>
         <p className="text-base text-muted-foreground">
-          Foto → Dengarkan → Tulis → Periksa
+          {t('dictSubtitle')}
         </p>
       </motion.div>
 
       {/* Step indicator */}
       <div className="flex items-center gap-2 mb-6">
         {[
-          { label: 'Foto Kata', num: 1 },
-          { label: 'Dikte', num: 2 },
-          { label: 'Periksa', num: 3 },
+          { label: t('dictPhotoWords'), num: 1 },
+          { label: t('dictTitle'), num: 2 },
+          { label: t('correct'), num: 3 },
         ].map((step) => {
           const phaseNum =
             phase === 'upload' || phase === 'extracting'
@@ -422,7 +424,7 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                 onClick={() => setError(null)}
                 className="text-red-500 underline text-xs mt-1"
               >
-                Tutup
+                {t('dictClose')}
               </button>
             </div>
           </motion.div>
@@ -456,12 +458,12 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
               <CardContent className="p-4 pt-3">
                 <div className="text-center mb-3">
                   <Mascot size="lg" className="mx-auto mb-1.5" />
-                  <h3 className="font-bold text-lg">Foto Daftar Kata</h3>
+                  <h3 className="font-bold text-lg">{t('dictPhotoWords')}</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Foto halaman buku yang berisi kata-kata yang ingin di diktekan
+                    {t('dictPhotoWordsDesc')}
                   </p>
                   <p className="text-xs text-muted-foreground/70 mt-1">
-                    Mendukung: Mandarin, Arab, Inggris, Indonesia, dan bahasa lainnya
+                    {t('dictSupports')}
                   </p>
                 </div>
 
@@ -469,24 +471,24 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                 <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-5">
                   <div className="flex items-center gap-2 text-blue-700 font-semibold text-base mb-2">
                     <HelpCircle size={16} />
-                    Cara pakai:
+                    {t('dictHowTo')}
                   </div>
                   <ol className="space-y-2 text-base text-blue-800">
                     <li className="flex gap-2">
                       <span className="font-bold text-blue-600">1.</span>
-                      <span>Siapkan halaman daftar kata yang ingin di diktekan</span>
+                      <span>{t('dictStep1')}</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="font-bold text-blue-600">2.</span>
-                      <span>Foto daftar kata tersebut — pastikan semua karakter terlihat jelas</span>
+                      <span>{t('dictStep2')}</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="font-bold text-blue-600">3.</span>
-                      <span>{MASCOT_NAME} akan membacakan kata satu per satu, kamu tulis di kertas</span>
+                      <span>{MASCOT_NAME} {t('dictStep3Suffix')}</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="font-bold text-blue-600">4.</span>
-                      <span>Setelah selesai, foto hasil tulisanmu untuk diperiksa</span>
+                      <span>{t('dictStep4')}</span>
                     </li>
                   </ol>
                 </div>
@@ -513,14 +515,14 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                   className="w-full h-14 rounded-xl text-base font-bold gap-3 kawabel-gradient text-white"
                 >
                   <Camera size={22} />
-                  Foto Daftar Kata
+                  {t('dictPhotoWords')}
                 </Button>
 
                 <button
                   onClick={() => wordGalleryRef.current?.click()}
                   className="w-full text-center text-xs text-primary font-medium mt-3 hover:underline"
                 >
-                  Atau pilih foto dari galeri
+                  {t('dictGallery')}
                 </button>
               </CardContent>
             </Card>
@@ -539,9 +541,9 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
             <Mascot size="xl" animate />
             <Loader2 className="animate-spin text-primary" size={28} />
             <div className="text-center">
-              <p className="font-semibold text-base">Membaca kata dari foto...</p>
+              <p className="font-semibold text-base">{t('dictReading')}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {MASCOT_NAME} sedang mengenali kata-kata dari foto
+                {MASCOT_NAME} {t('dictReadingDesc')}
               </p>
             </div>
           </motion.div>
@@ -558,10 +560,10 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
             {/* Word count & progress */}
             <div className="flex items-center justify-between mb-3">
               <span className="text-base font-medium">
-                Kata {currentIdx + 1} dari {words.length}
+                {t('dictWord')} {currentIdx + 1} {t('dictOf')} {words.length}
               </span>
               <span className="text-xs text-muted-foreground">
-                {spokenIndices.size}/{words.length} didengarkan
+                {spokenIndices.size}/{words.length} {t('dictListened')}
               </span>
             </div>
 
@@ -582,11 +584,10 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                 </div>
                 <div>
                   <p className="text-base font-semibold text-amber-800">
-                    Siapkan kertas & pensil!
+                    {t('dictPrepare')}
                   </p>
                   <p className="text-xs text-amber-700 mt-0.5">
-                    Tekan tombol untuk mendengar kata, lalu tulis jawabanmu di kertas.
-                    Setiap kata bisa didengar berkali-kali.
+                    {t('dictPrepareDesc')}
                   </p>
                 </div>
               </CardContent>
@@ -596,7 +597,7 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
             <Card className="mb-4">
               <CardContent className="p-8 text-center">
                 <p className="text-base text-muted-foreground mb-1">
-                  Arti: <span className="font-medium text-foreground">{words[currentIdx]?.meaning}</span>
+                  {t('dictMeaning')}: <span className="font-medium text-foreground">{words[currentIdx]?.meaning}</span>
                 </p>
 
                 <Button
@@ -605,7 +606,7 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                   className="mt-4 h-16 px-10 rounded-2xl text-lg font-bold gap-3 kawabel-gradient text-white shadow-lg"
                 >
                   <Volume2 size={24} />
-                  Dengarkan
+                  {t('dictListen')}
                 </Button>
 
                 {spokenIndices.has(currentIdx) && (
@@ -614,7 +615,7 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                     animate={{ opacity: 1 }}
                     className="text-xs text-green-600 mt-3 font-medium"
                   >
-                    Sudah diputar — tulis di kertas, lalu lanjut!
+                    {t('dictPlayed')}
                   </motion.p>
                 )}
               </CardContent>
@@ -637,7 +638,7 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                 className="flex-1 rounded-xl h-12 gap-2"
               >
                 <RotateCcw size={16} />
-                Ulang
+                {t('dictRepeat')}
               </Button>
 
               {currentIdx < words.length - 1 ? (
@@ -645,7 +646,7 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                   onClick={goNext}
                   className="flex-1 rounded-xl h-12 gap-2"
                 >
-                  Lanjut
+                  {t('dictNext')}
                   <ChevronRight size={18} />
                 </Button>
               ) : (
@@ -654,14 +655,14 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                   className="flex-1 rounded-xl h-12 gap-2 bg-green-600 hover:bg-green-700"
                 >
                   <Check size={18} />
-                  Selesai Dikte
+                  {t('dictFinish')}
                 </Button>
               )}
             </div>
 
             {/* Quick word list overview */}
             <div className="mt-5">
-              <p className="text-xs font-medium text-muted-foreground mb-2">Daftar kata:</p>
+              <p className="text-xs font-medium text-muted-foreground mb-2">{t('dictWordList')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {words.map((w, i) => (
                   <button
@@ -695,20 +696,20 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
               <CardContent className="p-6">
                 <div className="text-center mb-5">
                   <Mascot size="lg" className="mx-auto mb-3" />
-                  <h3 className="font-bold text-lg">Langkah 3: Foto Jawabanmu</h3>
+                  <h3 className="font-bold text-lg">{t('dictPhotoAnswer')}</h3>
                   <p className="text-base text-muted-foreground mt-1">
-                    Foto kertas yang berisi tulisanmu. Pastikan tulisan terlihat jelas!
+                    {t('dictPhotoAnswerDesc')}
                   </p>
                 </div>
 
                 {/* Tips */}
                 <div className="bg-green-50 border border-green-100 rounded-xl p-4 mb-5">
-                  <p className="text-xs font-semibold text-green-700 mb-1.5">Tips foto yang bagus:</p>
+                  <p className="text-xs font-semibold text-green-700 mb-1.5">{t('dictPhotoTips')}</p>
                   <ul className="space-y-1 text-xs text-green-800">
-                    <li>• Letakkan kertas di permukaan datar dengan cahaya terang</li>
-                    <li>• Pastikan semua tulisan masuk dalam frame</li>
-                    <li>• Tulis dengan urutan yang sama seperti dikte</li>
-                    <li>• Hindari bayangan di atas tulisan</li>
+                    <li>• {t('dictTip1')}</li>
+                    <li>• {t('dictTip2')}</li>
+                    <li>• {t('dictTip3')}</li>
+                    <li>• {t('dictTip4')}</li>
                   </ul>
                 </div>
 
@@ -734,21 +735,21 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                   className="w-full h-14 rounded-xl text-base font-bold gap-3 kawabel-gradient text-white"
                 >
                   <Camera size={22} />
-                  Foto Jawaban
+                  {t('dictPhotoBtn')}
                 </Button>
 
                 <button
                   onClick={() => answerGalleryRef.current?.click()}
                   className="w-full text-center text-xs text-primary font-medium mt-3 hover:underline"
                 >
-                  Atau pilih foto dari galeri
+                  {t('dictGallery')}
                 </button>
 
                 <button
                   onClick={() => setPhase('dictation')}
                   className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-3 transition-colors"
                 >
-                  ← Kembali ke dikte
+                  {t('dictBackToDictation')}
                 </button>
               </CardContent>
             </Card>
@@ -767,9 +768,9 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
             <Mascot size="xl" animate />
             <Loader2 className="animate-spin text-primary" size={28} />
             <div className="text-center">
-              <p className="font-semibold text-base">Memeriksa jawaban...</p>
+              <p className="font-semibold text-base">{t('dictChecking')}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {MASCOT_NAME} sedang membandingkan tulisanmu
+                {MASCOT_NAME} {t('dictCheckingDesc')}
               </p>
             </div>
           </motion.div>
@@ -807,14 +808,14 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                         : '💪'}
                 </motion.div>
                 <h3 className="text-2xl font-bold">
-                  {correctCount}/{words.length} Benar
+                  {correctCount}/{words.length} {t('dictCorrect')}
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1">
                   {correctCount === words.length
-                    ? 'Sempurna! Kamu hebat!'
+                    ? t('dictPerfect')
                     : correctCount >= words.length * 0.7
-                      ? 'Bagus sekali! Terus berlatih!'
-                      : 'Jangan menyerah, coba lagi!'}
+                      ? t('dictGood')
+                      : t('dictTryAgain')}
                 </p>
                 {correctCount > 0 && (
                   <motion.p
@@ -889,7 +890,7 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                 className="flex-1 rounded-xl h-12 gap-2"
               >
                 <RotateCcw size={16} />
-                Mulai Baru
+                {t('dictStartOver')}
               </Button>
               <Button
                 onClick={() => {
@@ -902,7 +903,7 @@ Be lenient with minor imperfections but check accuracy. Match answers in order (
                 className="flex-1 rounded-xl h-12 gap-2"
               >
                 <RotateCcw size={16} />
-                Ulangi Kata Sama
+                {t('dictRepeatSame')}
               </Button>
             </div>
           </motion.div>

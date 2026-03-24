@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/store/use-subscription';
 import { SUBSCRIPTION_PRICE } from '@/lib/constants';
 import { PaymentSheet } from '@/components/pricing/payment-sheet';
+import { useT } from '@/store/use-language';
 import {
   Check,
   X,
@@ -40,7 +41,7 @@ const item = {
 
 interface FeatureRow {
   icon: React.ReactNode;
-  label: string;
+  labelKey: string;
   free: string;
   premium: string;
   freeCheck: boolean;
@@ -48,46 +49,22 @@ interface FeatureRow {
 }
 
 const COMPARISON: FeatureRow[] = [
-  { icon: <MessageCircle size={16} />, label: 'Chat AI', free: '5/hari', premium: 'Unlimited', freeCheck: true, premiumCheck: true },
-  { icon: <Camera size={16} />, label: 'Foto PR', free: '2/hari', premium: 'Unlimited', freeCheck: true, premiumCheck: true },
-  { icon: <Brain size={16} />, label: 'Kuis Latihan', free: '2/hari', premium: 'Unlimited', freeCheck: true, premiumCheck: true },
-  { icon: <PenLine size={16} />, label: 'Dikte', free: '3/hari', premium: 'Unlimited', freeCheck: true, premiumCheck: true },
-  { icon: <Heart size={16} />, label: 'Hati (nyawa)', free: '5 hati', premium: 'Unlimited', freeCheck: true, premiumCheck: true },
-  { icon: <Megaphone size={16} />, label: 'Tanpa iklan', free: '', premium: '', freeCheck: false, premiumCheck: true },
-  { icon: <BarChart3 size={16} />, label: 'Laporan WhatsApp', free: '', premium: '', freeCheck: false, premiumCheck: true },
-  { icon: <GraduationCap size={16} />, label: 'Kurikulum lengkap', free: '', premium: '', freeCheck: false, premiumCheck: true },
+  { icon: <MessageCircle size={16} />, labelKey: 'featureChat', free: '5/day', premium: 'unlimited', freeCheck: true, premiumCheck: true },
+  { icon: <Camera size={16} />, labelKey: 'featurePhoto', free: '2/day', premium: 'unlimited', freeCheck: true, premiumCheck: true },
+  { icon: <Brain size={16} />, labelKey: 'featureQuiz', free: '2/day', premium: 'unlimited', freeCheck: true, premiumCheck: true },
+  { icon: <PenLine size={16} />, labelKey: 'featureDictation', free: '3/day', premium: 'unlimited', freeCheck: true, premiumCheck: true },
+  { icon: <Heart size={16} />, labelKey: 'featureHearts', free: '5', premium: 'unlimited', freeCheck: true, premiumCheck: true },
+  { icon: <Megaphone size={16} />, labelKey: 'featureNoAds', free: '', premium: '', freeCheck: false, premiumCheck: true },
+  { icon: <BarChart3 size={16} />, labelKey: 'featureWhatsApp', free: '', premium: '', freeCheck: false, premiumCheck: true },
+  { icon: <GraduationCap size={16} />, labelKey: 'featureCurriculum', free: '', premium: '', freeCheck: false, premiumCheck: true },
 ];
 
-const FAQ_ITEMS = [
-  {
-    q: 'Apakah ada masa percobaan gratis?',
-    a: 'Ya! Semua pengguna baru mendapat 7 hari akses penuh gratis. Tidak perlu kartu kredit.',
-  },
-  {
-    q: 'Bagaimana cara bayar?',
-    a: 'Pembayaran melalui transfer bank BCA. Setelah transfer, upload bukti pembayaran dan tim kami akan verifikasi dalam 1x24 jam.',
-  },
-  {
-    q: 'Berapa biaya langganan?',
-    a: 'Langganan Premium Rp 750.000/bulan per siswa. Kamu juga mendapat 7 hari gratis untuk mencoba semua fitur tanpa risiko.',
-  },
-  {
-    q: 'Apa yang terjadi setelah masa percobaan?',
-    a: 'Kamu tetap bisa menggunakan Kawabel dengan batasan harian (5 chat, 2 foto PR, 2 kuis, 3 dikte per hari). Upgrade kapan saja untuk akses unlimited.',
-  },
-  {
-    q: 'Bisa berhenti berlangganan?',
-    a: 'Tentu! Langganan tidak diperpanjang otomatis. Setelah masa aktif berakhir, kamu kembali ke paket gratis.',
-  },
-  {
-    q: 'Saya punya bimbel, bisa kerja sama?',
-    a: 'Bisa! Kami punya program khusus untuk bimbel dan sekolah dengan harga spesial per siswa. Kunjungi halaman Partner kami untuk info lebih lanjut.',
-  },
-  {
-    q: 'Apa itu Laporan WhatsApp?',
-    a: 'Orang tua akan menerima laporan mingguan di WhatsApp tentang progress belajar anak, termasuk mata pelajaran yang dipelajari dan pencapaian.',
-  },
-];
+const FREE_LIMITS_DISPLAY: Record<string, { id: string; en: string }> = {
+  '5/day': { id: '5/hari', en: '5/day' },
+  '2/day': { id: '2/hari', en: '2/day' },
+  '3/day': { id: '3/hari', en: '3/day' },
+  '5': { id: '5 hati', en: '5 hearts' },
+};
 
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
@@ -132,6 +109,7 @@ function VoucherRedeem() {
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const { redeemVoucher } = useSubscription();
+  const t = useT();
 
   const handleRedeem = () => {
     if (!code.trim()) return;
@@ -161,8 +139,8 @@ function VoucherRedeem() {
               <Ticket size={20} className="text-amber-600" />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-semibold text-amber-900">Punya voucher?</p>
-              <p className="text-xs text-amber-700">Masukkan kode untuk aktivasi Premium gratis</p>
+              <p className="text-sm font-semibold text-amber-900">{t('priceVoucher')}</p>
+              <p className="text-xs text-amber-700">{t('priceVoucherDesc')}</p>
             </div>
             <motion.div
               animate={{ rotate: open ? 180 : 0 }}
@@ -196,7 +174,7 @@ function VoucherRedeem() {
                       disabled={!code.trim() || loading}
                       className="h-11 px-5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold"
                     >
-                      {loading ? '...' : 'Pakai'}
+                      {loading ? '...' : t('priceVoucherUse')}
                     </Button>
                   </div>
 
@@ -229,6 +207,13 @@ export function PricingPage() {
   const { isPremium, plan, trialDaysLeft } = useSubscription();
   const premium = isPremium();
   const daysLeft = trialDaysLeft();
+  const t = useT();
+  const isEn = t('greeting') === 'Hello';
+
+  const faqItems = Array.from({ length: 7 }, (_, i) => ({
+    q: t(`priceFaqQ${i + 1}` as never),
+    a: t(`priceFaqA${i + 1}` as never),
+  }));
 
   return (
     <div className="px-4 py-5 pb-24 sm:pb-8 space-y-6 max-w-xl mx-auto">
@@ -253,7 +238,7 @@ export function PricingPage() {
           className="text-2xl font-bold text-foreground"
           style={{ fontFamily: 'var(--font-nunito)' }}
         >
-          Belajar Tanpa Batas
+          {t('priceTitle')}
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
@@ -261,7 +246,7 @@ export function PricingPage() {
           transition={{ delay: 0.2 }}
           className="text-sm text-muted-foreground mt-1"
         >
-          Investasi terbaik untuk masa depan anak
+          {t('priceSubtitle')}
         </motion.p>
       </motion.div>
 
@@ -278,28 +263,35 @@ export function PricingPage() {
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-1">
                 <Sparkles size={18} className="text-muted-foreground" />
-                <h3 className="font-bold text-base">Gratis</h3>
+                <h3 className="font-bold text-base">{t('priceFree')}</h3>
               </div>
               <p className="text-2xl font-black text-foreground mb-1">
                 Rp 0
-                <span className="text-sm font-normal text-muted-foreground">/bulan</span>
+                <span className="text-sm font-normal text-muted-foreground">/{t('priceMonth')}</span>
               </p>
-              <p className="text-xs text-muted-foreground mb-4">Akses dasar dengan batasan harian</p>
+              <p className="text-xs text-muted-foreground mb-4">{t('priceFreeDesc')}</p>
 
               <div className="space-y-2">
-                {COMPARISON.map((row, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
-                    {row.freeCheck ? (
-                      <Check size={14} className="text-green-500 shrink-0" />
-                    ) : (
-                      <X size={14} className="text-muted-foreground/40 shrink-0" />
-                    )}
-                    <span className={row.freeCheck ? 'text-foreground' : 'text-muted-foreground/50'}>
-                      {row.label}
-                      {row.free && <span className="text-muted-foreground ml-1">({row.free})</span>}
-                    </span>
-                  </div>
-                ))}
+                {COMPARISON.map((row, i) => {
+                  const freeDisplay = row.free
+                    ? (FREE_LIMITS_DISPLAY[row.free]
+                        ? (isEn ? FREE_LIMITS_DISPLAY[row.free].en : FREE_LIMITS_DISPLAY[row.free].id)
+                        : row.free)
+                    : '';
+                  return (
+                    <div key={i} className="flex items-center gap-2 text-sm">
+                      {row.freeCheck ? (
+                        <Check size={14} className="text-green-500 shrink-0" />
+                      ) : (
+                        <X size={14} className="text-muted-foreground/40 shrink-0" />
+                      )}
+                      <span className={row.freeCheck ? 'text-foreground' : 'text-muted-foreground/50'}>
+                        {t(row.labelKey as never)}
+                        {freeDisplay && <span className="text-muted-foreground ml-1">({freeDisplay})</span>}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -317,17 +309,17 @@ export function PricingPage() {
                 className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-bold shadow-md flex items-center gap-1"
               >
                 <Zap size={12} />
-                Per siswa / bulan
+                {t('pricePerStudent')} / {t('priceMonth')}
               </motion.div>
             </div>
 
             <CardContent className="p-5 pt-6">
               <div className="flex items-center gap-2 mb-1">
                 <Crown size={18} className="text-amber-500" />
-                <h3 className="font-bold text-base">Premium</h3>
+                <h3 className="font-bold text-base">{t('pricePremium')}</h3>
                 {premium && (
                   <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">
-                    Aktif
+                    {t('priceActive')}
                   </span>
                 )}
               </div>
@@ -336,19 +328,19 @@ export function PricingPage() {
               <div className="mb-1">
                 <p className="text-2xl font-black text-foreground">
                   Rp {formatPrice(SUBSCRIPTION_PRICE)}
-                  <span className="text-sm font-normal text-muted-foreground">/bulan per siswa</span>
+                  <span className="text-sm font-normal text-muted-foreground">/{t('priceMonth')} {t('pricePerStudent')}</span>
                 </p>
               </div>
 
-              <p className="text-xs text-muted-foreground mb-4">Akses penuh tanpa batas</p>
+              <p className="text-xs text-muted-foreground mb-4">{t('priceFullAccess')}</p>
 
               <div className="space-y-2">
                 {COMPARISON.map((row, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm">
                     <Check size={14} className="text-green-500 shrink-0" />
                     <span className="text-foreground">
-                      {row.label}
-                      {row.premium && <span className="text-primary font-medium ml-1">({row.premium})</span>}
+                      {t(row.labelKey as never)}
+                      {row.premium && <span className="text-primary font-medium ml-1">({t('unlimited')})</span>}
                     </span>
                   </div>
                 ))}
@@ -360,8 +352,8 @@ export function PricingPage() {
                   <div className="text-center">
                     <p className="text-sm text-green-600 font-medium">
                       {plan === 'trial'
-                        ? `Masa percobaan: ${daysLeft} hari tersisa`
-                        : 'Langganan aktif'}
+                        ? `${daysLeft} ${t('priceTrialDays')}`
+                        : t('priceActiveSub')}
                     </p>
                   </div>
                 ) : (
@@ -371,10 +363,10 @@ export function PricingPage() {
                       className="w-full h-12 text-base font-bold rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md"
                     >
                       <Crown size={18} className="mr-2" />
-                      Langganan Rp {formatPrice(SUBSCRIPTION_PRICE)}/bulan
+                      {t('priceSubscribe')} Rp {formatPrice(SUBSCRIPTION_PRICE)}/{t('priceMonth')}
                     </Button>
                     <p className="text-center text-xs text-muted-foreground mt-2">
-                      + gratis 7 hari pertama!
+                      {t('priceFreeTrial')}
                     </p>
                   </>
                 )}
@@ -392,7 +384,7 @@ export function PricingPage() {
         className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100"
       >
         <p className="text-sm text-green-800 font-medium text-center">
-          Lebih hemat dari les privat (Rp&nbsp;1-2jt/bulan). Kawabel siap bantu 24/7 kapan saja.
+          {t('priceSocial')}
         </p>
       </motion.div>
 
@@ -412,8 +404,8 @@ export function PricingPage() {
                 <Handshake size={20} className="text-blue-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-blue-900">Punya bimbel atau sekolah?</p>
-                <p className="text-xs text-blue-700">Daftar sebagai Partner — harga spesial per siswa</p>
+                <p className="text-sm font-semibold text-blue-900">{t('pricePartner')}</p>
+                <p className="text-xs text-blue-700">{t('pricePartnerDesc')}</p>
               </div>
               <ChevronDown size={16} className="text-blue-400 -rotate-90 shrink-0" />
             </CardContent>
@@ -428,11 +420,11 @@ export function PricingPage() {
         transition={{ delay: 0.4 }}
       >
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Pertanyaan Umum
+          {t('priceFAQ')}
         </h3>
         <Card className="shadow-sm">
           <CardContent className="px-4 py-1">
-            {FAQ_ITEMS.map((faq, i) => (
+            {faqItems.map((faq, i) => (
               <FAQItem key={i} q={faq.q} a={faq.a} />
             ))}
           </CardContent>

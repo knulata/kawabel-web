@@ -19,7 +19,7 @@
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Dikte Mandarin",
+      "name": "Dikte",
       "short_name": "Dikte",
       "url": "/dictation",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]

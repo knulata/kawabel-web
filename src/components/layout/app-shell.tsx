@@ -25,6 +25,7 @@ import { HeartsDisplay } from '@/components/home/hearts-display';
 import { Mascot } from '@/components/mascot';
 import { SignInButton } from '@/components/auth/sign-in-button';
 import { OnboardingModal } from '@/components/onboarding/onboarding-modal';
+import { InstallPrompt } from '@/components/layout/install-prompt';
 import { useLanguage, useT } from '@/store/use-language';
 
 const NAV_ITEMS_ID = [
@@ -49,9 +50,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { lang, setLang } = useLanguage();
   const t = useT();
   const NAV_ITEMS = lang === 'en' ? NAV_ITEMS_EN : NAV_ITEMS_ID;
-  const { xp, gems, streak, checkStreak, regenHearts } = useGamification();
+  const { xp, gems, streak, checkStreak, regenHearts, syncToServer, loadFromServer } = useGamification();
   const level = getLevelFromXP(xp);
   const [showSignInHint, setShowSignInHint] = useState(false);
+
+  // Register service worker
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  }, []);
 
   // Check streak & regen hearts on mount
   useEffect(() => {
@@ -78,6 +86,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const timer = setTimeout(() => setShowSignInHint(true), 30_000);
     return () => clearTimeout(timer);
   }, [student]);
+
+  // Sync gamification to server for signed-in users (debounced)
+  useEffect(() => {
+    if (!student?.email || !student?.id) return;
+    const timer = setTimeout(() => {
+      syncToServer(student.id);
+    }, 5000); // 5 second debounce
+    return () => clearTimeout(timer);
+  }, [student, xp, gems, streak, syncToServer]);
+
+  // Load gamification from server on sign-in
+  useEffect(() => {
+    if (student?.email && student?.id) {
+      loadFromServer(student.id);
+    }
+  }, [student?.email, student?.id, loadFromServer]);
 
   // Mark onboarding done when student gets a name
   useEffect(() => {
@@ -247,6 +271,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Onboarding modal for first-time visitors */}
       {showOnboarding && <OnboardingModal />}
+
+      {/* PWA install prompt */}
+      <InstallPrompt />
     </div>
   );
 }

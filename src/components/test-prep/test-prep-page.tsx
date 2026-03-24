@@ -17,6 +17,7 @@ import { PermissionGuide, usePermission } from '@/components/chat/permission-gui
 import { ComboCounter } from '@/components/home/combo-counter';
 import { UpgradePrompt } from '@/components/pricing/upgrade-prompt';
 import { Mascot } from '@/components/mascot';
+import { useT } from '@/store/use-language';
 import {
   BookOpen, Loader2, Check, X, ArrowRight, RotateCcw,
   ChevronLeft, Camera,
@@ -59,6 +60,7 @@ export function TestPrepPage() {
     useGamification();
   const { canUse, incrementUsage } = useSubscription();
   const cameraPerm = usePermission('camera');
+  const t = useT();
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [showPermGuide, setShowPermGuide] = useState(false);
   const [phase, setPhase] = useState<Phase>('school');
@@ -272,14 +274,14 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <h2 className="text-2xl font-bold">📝 Latihan Ujian</h2>
+        <h2 className="text-2xl font-bold">{t('testTitle')}</h2>
         <p className="text-base text-muted-foreground">
           {phase === 'school'
-            ? 'Pilih jenis sekolah'
+            ? t('testSchoolType')
             : phase === 'select'
-              ? 'Pilih mata pelajaran'
+              ? t('testSubject')
               : phase === 'topic'
-                ? `${subject} — foto buku atau pilih topik`
+                ? `${subject} — ${t('testTopicDesc')}`
                 : ''}
         </p>
       </motion.div>
@@ -291,7 +293,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
           animate={{ opacity: 1 }}
           className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-base text-red-700"
         >
-          💔 Hati habis! Tunggu regenerasi atau isi ulang dengan gems.
+          {t('testHeartsEmpty')}
         </motion.div>
       )}
 
@@ -353,7 +355,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
               className="text-sm text-primary font-medium mb-3 flex items-center gap-1 hover:underline"
             >
               <ChevronLeft size={14} />
-              Ganti jenis sekolah
+              {t('testChangeSchool')}
             </button>
             <div className="grid grid-cols-2 gap-3">
               {(SUBJECTS_BY_SCHOOL[schoolType] || []).map((subj) => (
@@ -386,7 +388,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
               className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <ChevronLeft size={16} />
-              Ganti mata pelajaran
+              {t('testChangeSubject')}
             </button>
 
             {/* Photo book option — primary CTA */}
@@ -397,9 +399,9 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                     <Camera size={20} className="text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-base font-semibold">Foto halaman buku</h3>
+                    <h3 className="text-base font-semibold">{t('testPhotoBook')}</h3>
                     <p className="text-sm text-muted-foreground mt-0.5">
-                      Foto halaman buku pelajaran — soal akan dibuat berdasarkan isi buku
+                      {t('testPhotoBookDesc')}
                     </p>
                   </div>
                 </div>
@@ -412,7 +414,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                         <div key={i} className="relative aspect-[3/4] rounded-lg overflow-hidden border border-border">
                           <img
                             src={img}
-                            alt={`Halaman ${i + 1}`}
+                            alt={`${t('testPages')} ${i + 1}`}
                             className="w-full h-full object-cover"
                           />
                           <button
@@ -434,11 +436,11 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                         disabled={hearts === 0}
                       >
                         <Camera size={20} />
-                        <span className="text-[10px] mt-1 font-medium">Tambah</span>
+                        <span className="text-[10px] mt-1 font-medium">{t('testAdd')}</span>
                       </button>
                     </div>
                     <p className="text-xs text-muted-foreground mt-2 text-center">
-                      {bookImages.length} halaman difoto — tambah lagi atau buat soal
+                      {bookImages.length} {t('testPagesPhotoed')}
                     </p>
                   </div>
                 )}
@@ -451,7 +453,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                     disabled={hearts === 0}
                   >
                     <ArrowRight size={18} />
-                    Buat Soal dari {bookImages.length} Halaman
+                    {t('testGenFromPages')} {bookImages.length} {t('testPages')}
                   </Button>
                 ) : (
                   <>
@@ -461,10 +463,10 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                       disabled={hearts === 0}
                     >
                       <Camera size={18} />
-                      Foto Halaman Buku
+                      {t('testPhotoPageBtn')}
                     </Button>
                     <p className="text-center text-xs text-muted-foreground mt-2">
-                      Foto beberapa halaman, lalu buat soal
+                      {t('testPhotoMultiple')}
                     </p>
                   </>
                 )}
@@ -474,7 +476,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             {/* Divider */}
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-border" />
-              <span className="text-sm text-muted-foreground">atau ketik topik</span>
+              <span className="text-sm text-muted-foreground">{t('testOrTypeTopic')}</span>
               <div className="flex-1 h-px bg-border" />
             </div>
 
@@ -485,7 +487,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                   <Textarea
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    placeholder={`Contoh: "${suggestions[0] || 'Bab 3 tentang...'}"` }
+                    placeholder={`${t('testTopicExample')}: "${suggestions[0] || 'Bab 3 tentang...'}"` }
                     className="min-h-[50px] max-h-24 resize-none rounded-xl text-base"
                     rows={1}
                   />
@@ -516,7 +518,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                   disabled={hearts === 0}
                 >
                   <ArrowRight size={18} className="mr-2" />
-                  {topic ? 'Mulai Latihan' : 'Latihan Acak'}
+                  {topic ? t('testStartPractice') : t('testRandomPractice')}
                 </Button>
               </CardContent>
             </Card>
@@ -536,10 +538,10 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             <Loader2 className="animate-spin text-primary" size={28} />
             <div className="text-center">
               <p className="font-semibold text-base">
-                {bookImages.length > 0 ? `Membaca ${bookImages.length} halaman & menyiapkan soal...` : `Menyiapkan soal ${subject}...`}
+                {bookImages.length > 0 ? `${t('testReadingPages')} ${bookImages.length} halaman & ${t('testPreparingQuiz').toLowerCase()}...` : `${t('testPreparingQuiz')} ${subject}...`}
               </p>
               {topic && bookImages.length === 0 && (
-                <p className="text-sm text-muted-foreground mt-1">Topik: {topic}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('testTopic')}: {topic}</p>
               )}
             </div>
           </motion.div>
@@ -556,7 +558,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
             {/* Progress */}
             <div className="flex items-center justify-between mb-4">
               <Badge variant="secondary">
-                Soal {currentQ + 1}/{questions.length}
+                {t('testQuestion')} {currentQ + 1}/{questions.length}
               </Badge>
               <span className="text-sm text-muted-foreground">
                 {subject}{topic ? ` · ${topic}` : ''}
@@ -644,7 +646,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                   <Card className="bg-blue-50 border-blue-200">
                     <CardContent className="p-4">
                       <p className="text-base text-blue-800">
-                        <span className="font-semibold">Penjelasan: </span>
+                        <span className="font-semibold">{t('testExplanation')}: </span>
                         {questions[currentQ].explanation}
                       </p>
                     </CardContent>
@@ -662,7 +664,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
               >
                 <span className="text-sm font-semibold text-primary">
                   +{10 + (combo >= 10 ? 5 : combo >= 5 ? 3 : combo >= 3 ? 2 : 0)} XP
-                  {combo >= 2 && ` (${combo}x kombo!)`}
+                  {combo >= 2 && ` (${combo}x ${t('testCombo')}!)`}
                 </span>
               </motion.div>
             )}
@@ -672,12 +674,12 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 {currentQ < questions.length - 1 ? (
                   <>
                     <ArrowRight size={18} className="mr-2" />
-                    Soal Berikutnya
+                    {t('testNextQuestion')}
                   </>
                 ) : (
                   <>
                     <Check size={18} className="mr-2" />
-                    Lihat Hasil
+                    {t('testViewResults')}
                   </>
                 )}
               </Button>
@@ -708,7 +710,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                     : '💪'}
             </motion.div>
             <h3 className="text-3xl font-bold mb-1">
-              {totalCorrect}/{questions.length} Benar
+              {totalCorrect}/{questions.length} {t('correct')}
             </h3>
 
             {totalCorrect === questions.length && (
@@ -718,18 +720,18 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 transition={{ delay: 0.3 }}
                 className="text-primary font-semibold mb-1"
               >
-                Sempurna! +20 XP bonus 🌟
+                {t('testPerfectBonus')}
               </motion.p>
             )}
 
             <p className="text-base text-muted-foreground mb-8">
               {totalCorrect === questions.length
-                ? 'Luar biasa! Kamu sempurna!'
+                ? t('testPerfect')
                 : totalCorrect >= 4
-                  ? 'Keren banget!'
+                  ? t('testGreat')
                   : totalCorrect >= 2
-                    ? 'Bagus, terus berlatih!'
-                    : 'Jangan menyerah, coba lagi!'}
+                    ? t('testKeepGoing')
+                    : t('testDontGiveUp')}
             </p>
 
             <div className="flex gap-3">
@@ -743,7 +745,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                 }}
               >
                 <RotateCcw size={16} className="mr-2" />
-                Ganti Mapel
+                {t('testChangeMapel')}
               </Button>
               <Button
                 className="flex-1 rounded-xl h-12"
@@ -756,7 +758,7 @@ Reply ONLY with JSON array: [{"question":"...","options":["A","B","C","D"],"corr
                   }
                 }}
               >
-                Coba Lagi
+                {t('testTryAgain')}
               </Button>
             </div>
           </motion.div>

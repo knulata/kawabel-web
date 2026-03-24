@@ -10,10 +10,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Mascot } from '@/components/mascot';
 import { SignInButton } from '@/components/auth/sign-in-button';
 import { BarChart3, BookOpen, PenLine, GraduationCap, LogIn } from 'lucide-react';
+import { useT } from '@/store/use-language';
 import type { ProgressEntry } from '@/types';
 
 export function ProgressPage() {
   const { student } = useStudent();
+  const t = useT();
   const [entries, setEntries] = useState<ProgressEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,11 +49,11 @@ export function ProgressPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <h2 className="text-2xl font-bold">📊 Progress Belajar</h2>
+        <h2 className="text-2xl font-bold">{t('progTitle')}</h2>
         <p className="text-base text-muted-foreground">
           {student
-            ? `Perkembangan belajar ${student.name?.split(' ')[0]}`
-            : 'Masuk untuk melihat progresss belajarmu'}
+            ? `${t('progSubtitle')} ${student.name?.split(' ')[0]}`
+            : t('progSignIn')}
         </p>
       </motion.div>
 
@@ -65,16 +67,16 @@ export function ProgressPage() {
             <CardContent className="p-8 text-center space-y-4">
               <Mascot size="xl" className="mx-auto" />
               <div>
-                <h3 className="font-bold text-lg">Masuk untuk melihat progress</h3>
+                <h3 className="font-bold text-lg">{t('progSignInTitle')}</h3>
                 <p className="text-base text-muted-foreground mt-1">
-                  Dengan masuk menggunakan Google, semua hasil belajar, skor, dan pencapaianmu akan tersimpan dan bisa dilihat di sini.
+                  {t('progSignInDesc')}
                 </p>
               </div>
               <div className="flex justify-center">
                 <SignInButton />
               </div>
               <p className="text-xs text-muted-foreground">
-                Tanpa masuk, kamu tetap bisa belajar — tapi progress tidak tersimpan ke server.
+                {t('progWithout')}
               </p>
             </CardContent>
           </Card>
@@ -95,21 +97,21 @@ export function ProgressPage() {
           <div className="grid grid-cols-3 gap-3 mb-6">
             {[
               {
-                label: 'PR',
+                label: t('progHomework'),
                 icon: BookOpen,
                 count: stats.homework.length,
                 avg: avgScore(stats.homework),
                 color: 'text-blue-500',
               },
               {
-                label: 'Ujian',
+                label: t('progExam'),
                 icon: GraduationCap,
                 count: stats.test.length,
                 avg: avgScore(stats.test),
                 color: 'text-purple-500',
               },
               {
-                label: 'Dikte',
+                label: t('progDictation'),
                 icon: PenLine,
                 count: stats.dictation.length,
                 avg: avgScore(stats.dictation),
@@ -137,14 +139,14 @@ export function ProgressPage() {
           {/* Recent activity */}
           <h3 className="font-semibold mb-3 flex items-center gap-2">
             <BarChart3 size={16} className="text-primary" />
-            Aktivitas Terakhir
+            {t('progRecent')}
           </h3>
 
           {entries.length === 0 ? (
             <div className="text-center py-12">
               <span className="text-4xl mb-3 block">📚</span>
               <p className="text-muted-foreground">
-                Belum ada aktivitas. Mulai belajar!
+                {t('progNoActivity')}
               </p>
             </div>
           ) : (
