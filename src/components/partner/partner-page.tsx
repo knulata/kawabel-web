@@ -20,6 +20,8 @@ import {
   School,
   BookOpen,
   Headphones,
+  TrendingUp,
+  Calculator,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -35,9 +37,9 @@ const item = {
 
 const BENEFITS = [
   {
-    icon: <Users size={22} />,
-    title: 'Harga Spesial per Siswa',
-    desc: 'Mulai dari Rp 59.000/siswa/bulan untuk paket 30+ siswa. Semakin banyak siswa, semakin hemat.',
+    icon: <TrendingUp size={22} />,
+    title: 'Margin Besar — Diskon 67%',
+    desc: 'Harga partner Rp 250.000/siswa/bulan, dibanding harga retail Rp 750.000. Selisihnya jadi keuntungan bimbel Anda.',
     gradient: 'from-blue-400 to-blue-600',
   },
   {
@@ -72,12 +74,99 @@ const BENEFITS = [
   },
 ];
 
-const PRICING_TIERS = [
-  { students: '1-10 siswa', price: 'Rp 99.000', per: '/siswa/bulan' },
-  { students: '11-30 siswa', price: 'Rp 79.000', per: '/siswa/bulan', popular: true },
-  { students: '31-100 siswa', price: 'Rp 59.000', per: '/siswa/bulan' },
-  { students: '100+ siswa', price: 'Hubungi kami', per: '' },
-];
+const PARTNER_PRICE = 250_000;
+const RETAIL_PRICE = 750_000;
+
+function formatRupiah(value: number): string {
+  return 'Rp ' + Math.round(value).toLocaleString('id-ID');
+}
+
+function ROICalculator() {
+  const [students, setStudents] = useState(50);
+  const [resalePrice, setResalePrice] = useState(450_000);
+
+  const monthlyCost = students * PARTNER_PRICE;
+  const monthlyRevenue = students * resalePrice;
+  const monthlyProfit = monthlyRevenue - monthlyCost;
+  const annualProfit = monthlyProfit * 12;
+  const parentSavings = RETAIL_PRICE - resalePrice;
+
+  return (
+    <Card className="shadow-sm border-2 border-primary/20">
+      <CardContent className="p-5 space-y-5">
+        <div className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white">
+            <Calculator size={18} />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm">Hitung Profit Bimbel Anda</h3>
+            <p className="text-xs text-muted-foreground">Geser slider untuk melihat estimasi</p>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-baseline justify-between mb-2">
+            <label className="text-xs font-semibold text-muted-foreground">Jumlah siswa</label>
+            <span className="text-sm font-bold text-foreground">{students} siswa</span>
+          </div>
+          <input
+            type="range"
+            min={10}
+            max={300}
+            step={5}
+            value={students}
+            onChange={(e) => setStudents(Number(e.target.value))}
+            className="w-full accent-primary"
+          />
+        </div>
+
+        <div>
+          <div className="flex items-baseline justify-between mb-2">
+            <label className="text-xs font-semibold text-muted-foreground">
+              Harga jual ke orang tua
+            </label>
+            <span className="text-sm font-bold text-foreground">
+              {formatRupiah(resalePrice)}<span className="text-xs font-normal text-muted-foreground">/siswa/bln</span>
+            </span>
+          </div>
+          <input
+            type="range"
+            min={PARTNER_PRICE}
+            max={RETAIL_PRICE}
+            step={25_000}
+            value={resalePrice}
+            onChange={(e) => setResalePrice(Number(e.target.value))}
+            className="w-full accent-primary"
+          />
+          <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+            <span>Rp 250rb (impas)</span>
+            <span>Rp 750rb (retail)</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 pt-1">
+          <div className="rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 p-3">
+            <p className="text-[10px] font-semibold text-green-700 uppercase tracking-wide">Profit / bulan</p>
+            <p className="text-lg font-black text-green-900 mt-0.5">{formatRupiah(monthlyProfit)}</p>
+          </div>
+          <div className="rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-3">
+            <p className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wide">Profit / tahun</p>
+            <p className="text-lg font-black text-emerald-900 mt-0.5">{formatRupiah(annualProfit)}</p>
+          </div>
+        </div>
+
+        <div className="rounded-lg bg-blue-50 border border-blue-100 p-3 text-xs text-blue-900 leading-relaxed">
+          <span className="font-semibold">Bonus untuk orang tua: </span>
+          mereka hemat <span className="font-bold">{formatRupiah(parentSavings)}/bulan</span> dibanding daftar Premium langsung di kawabel.com (Rp 750.000).
+        </div>
+
+        <p className="text-[10px] text-muted-foreground text-center">
+          Estimasi kotor; belum termasuk PPN dan biaya operasional bimbel Anda.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
 
 const FAQ_ITEMS = [
   {
@@ -281,7 +370,7 @@ export function PartnerPage() {
           </motion.div>
         </div>
 
-        {/* Pricing tiers */}
+        {/* Retail vs Partner comparison */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -290,30 +379,56 @@ export function PartnerPage() {
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 text-center">
             Harga Partner
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {PRICING_TIERS.map((tier) => (
-              <Card
-                key={tier.students}
-                className={`shadow-sm ${tier.popular ? 'border-2 border-primary/30 relative' : ''}`}
-              >
-                {tier.popular && (
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                    <span className="px-2 py-0.5 rounded-full bg-primary text-white text-[10px] font-bold">
-                      Populer
-                    </span>
-                  </div>
-                )}
-                <CardContent className="p-4 text-center">
-                  <p className="text-xs text-muted-foreground mb-2">{tier.students}</p>
-                  <p className="text-lg font-black text-foreground">{tier.price}</p>
-                  <p className="text-xs text-muted-foreground">{tier.per}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="shadow-sm">
+              <CardContent className="p-5 text-center">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                  Harga retail
+                </p>
+                <p className="text-xl font-black text-muted-foreground line-through decoration-2">
+                  Rp 750.000
+                </p>
+                <p className="text-[11px] text-muted-foreground mt-1">/siswa/bulan</p>
+                <p className="text-[10px] text-muted-foreground mt-3 leading-relaxed">
+                  Yang dibayar orang tua jika daftar Premium langsung di kawabel.com
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-md border-2 border-primary/40 relative bg-gradient-to-br from-green-50 to-emerald-50">
+              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
+                <span className="px-2.5 py-0.5 rounded-full bg-primary text-white text-[10px] font-bold">
+                  Hemat 67%
+                </span>
+              </div>
+              <CardContent className="p-5 text-center">
+                <p className="text-[11px] font-semibold text-green-700 uppercase tracking-wide mb-2">
+                  Harga partner
+                </p>
+                <p className="text-2xl font-black kawabel-gradient bg-clip-text text-transparent">
+                  Rp 250.000
+                </p>
+                <p className="text-[11px] text-green-800 mt-1">/siswa/bulan</p>
+                <p className="text-[10px] text-green-900/70 mt-3 leading-relaxed">
+                  Harga grosir untuk bimbel — selisihnya jadi margin Anda
+                </p>
+              </CardContent>
+            </Card>
           </div>
           <p className="text-xs text-muted-foreground text-center mt-3">
-            Semua harga belum termasuk PPN. Diskon tambahan untuk kontrak tahunan.
+            Harga flat tanpa minimum siswa. Belum termasuk PPN. Diskon tambahan untuk kontrak tahunan.
           </p>
+        </motion.div>
+
+        {/* ROI calculator */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.32 }}
+        >
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 text-center">
+            Kalkulator Profit
+          </h2>
+          <ROICalculator />
         </motion.div>
 
         {/* Use cases */}
